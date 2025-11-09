@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class SendDebugComponent : HandlerComponent
+    public class SendDebugComponent : CreatureComponent
     {
         private ChangeNameComponent _changeNameComponent;
 

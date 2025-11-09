@@ -1,5 +1,6 @@
 using Game.NetworkManagers;
 using Game.Services;
+using Game.Stages;
 using GameCore.LifetimeScopes;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -14,11 +15,17 @@ namespace Game.LifetimeScopes
         
         protected override void RegisterConfigs()
         {
-            base.RegisterConfigs();
-            
             RegisterConfigs(_gameConfigsAssetLabel);
         }
 
+        protected override void RegisterStages()
+        {
+            base.RegisterStages();
+            
+            Register<SpawnPlayerStage>();//todo stages components
+            Register<RunNetworkStage>();
+        }
+        
         protected override void RegisterServices()
         {
             base.RegisterServices();

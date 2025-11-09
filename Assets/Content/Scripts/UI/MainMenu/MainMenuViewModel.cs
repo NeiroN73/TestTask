@@ -13,7 +13,7 @@ namespace Game.UI.MainMenu
     {
         [Inject] private ScreensService _screensService;
         [Inject] private ScenesService _scenesService;
-        [Inject] private HandlersFactory _handlersFactory;
+        [Inject] private CreaturesFactory creaturesFactory;
         [Inject] private GameNetworkManager _gameNetworkManager;
         [Inject] private NetworkService _networkService;
         

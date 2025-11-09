@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class MoveComponent : HandlerComponent, ITickable
+    public class MoveComponent : CreatureComponent, ITickable
     {
         private static readonly int Running = Animator.StringToHash("isRunning");
         
@@ -27,7 +27,7 @@ namespace Game.Components
             if(!isLocalPlayer)
                 return;
 
-            if (!Handler)
+            if (!Creature)
                 return;
             
             var moveDirection = _controllerComponent.MoveDirection;
@@ -39,8 +39,8 @@ namespace Game.Components
                     Vector3.up
                 );
                 
-                Handler.transform.rotation = Quaternion.Slerp(
-                    Handler.transform.rotation,
+                Creature.transform.rotation = Quaternion.Slerp(
+                    Creature.transform.rotation,
                     targetRotation,
                     _moveData.RotateSpeed * Time.deltaTime
                 );

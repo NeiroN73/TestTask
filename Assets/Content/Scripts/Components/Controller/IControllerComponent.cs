@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public abstract class ControllerComponent : HandlerComponent
+    public abstract class ControllerComponent : CreatureComponent
     {
         public abstract void Init();
         public abstract Vector3 MoveDirection { get; protected set; }
