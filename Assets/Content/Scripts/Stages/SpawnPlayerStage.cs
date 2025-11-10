@@ -10,7 +10,7 @@ namespace Game.Stages
     {
         [Inject] private CreaturesFactory creaturesFactory;
         
-        public async override UniTask Initialize()
+        public async override UniTask Run()
         {
             NetworkServer.RegisterHandler<CreatePlayerMessage>(OnCreateCharacter);
             await UniTask.CompletedTask;
@@ -45,7 +45,6 @@ namespace Game.Stages
 
             var player = creaturesFactory.Create<PlayerServerCreature>();
             NetworkServer.AddPlayerForConnection(conn, player.gameObject);
-            player.TargetRpcInitialize(conn);
             player.RpcSetName(message.Name);
         }
 

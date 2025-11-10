@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Game.Components;
-using Game.NetworkManagers;
 using GameCore.Creatures;
 using Mirror;
+using R3;
 using UnityEngine;
-using VContainer;
 
 namespace Game.Creatures
 {
@@ -12,51 +13,43 @@ namespace Game.Creatures
     {
         [field: SerializeField] public string Id { get; private set; }
         
-        protected IObjectResolver ClientObjectResolver { get; private set; }
-        protected IObjectResolver ServerObjectResolver { get; private set; }
+        protected Dictionary<Type, CreatureComponent> ComponentsByType = new();
+        protected CompositeDisposable Disposable = new();
         
-        protected List<CreatureComponent> Components = new();
-        
-        public override void OnStartClient()
+        [ReadOnly] private List<CreatureComponent> _components = new();
+
+        public void TryInitialize()
         {
-            if (NetworkManager.singleton is GameNetworkManager manager) // костыльный инжект, ничего лучше не придумать?
+            _components = GetComponentsInChildren<CreatureComponent>().ToList();
+            ComponentsByType = _components.ToDictionary(c => c.GetType());
+            
+            foreach (var (type, component) in ComponentsByType)
             {
-                //ClientObjectResolver = manager.ObjectResolver;
-                ClientObjectResolver.Inject(this);
+                component.TryInitialize(this);
             }
+            Initialize();
         }
 
-        public void Inject()
+        public void TryDispose()
         {
-            
+            foreach (var (type, component) in ComponentsByType)
+            {
+                component.Dispose();
+            }
+            Disposable.Dispose();
+            Dispose();
+        }
+
+        public T GetCreatureComponentByType<T>() where T : CreatureComponent
+        {
+            if (ComponentsByType.TryGetValue(typeof(T), out var component))
+            {
+                return (T)component;
+            }
+            return null;
         }
         
-        public abstract void Initialize();
-    }
-
-    public abstract class ClientNetworkCreature : NetworkCreature
-    {
-        public override void Initialize()
-        {
-            
-        }
-
-        public void ClientInitialize()
-        {
-            
-        }
-    }
-
-    public abstract class ServerNetworkCreature : NetworkCreature
-    {
-        public override void Initialize()
-        {
-            
-        }
-
-        public void ServerInitialize()
-        {
-            
-        }
+        protected virtual void Initialize() {}
+        protected virtual void Dispose() {}
     }
 }

@@ -10,10 +10,14 @@ namespace Game.Components
         protected NetworkCreature Creature;
         protected CompositeDisposable Disposable = new();
         
-        public void Init(NetworkCreature creature)
+        public void TryInitialize(NetworkCreature creature)
         {
             Creature = creature;
+
+            Initialize();
         }
+
+        protected virtual void Initialize() {}
 
         public void Dispose()
         {

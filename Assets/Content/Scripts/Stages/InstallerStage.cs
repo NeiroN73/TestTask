@@ -5,6 +5,7 @@ namespace Game.Stages
 {
     public abstract class InstallerStage : NetworkBehaviour
     {
-        public abstract UniTask Initialize();
+        public abstract UniTask Run();
+        public virtual void Dispose() {}
     }
 }

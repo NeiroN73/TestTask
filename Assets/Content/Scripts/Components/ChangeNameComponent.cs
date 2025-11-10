@@ -30,6 +30,7 @@ namespace Game.Components
             }
         }
         
+        [ClientRpc]
         public void Init(string username)
         {
             if (isServer)

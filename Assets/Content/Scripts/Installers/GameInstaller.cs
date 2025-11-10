@@ -29,12 +29,29 @@ namespace Game.Installers
             DontDestroyOnLoad(this);
 
             BuildStages();
+            RunStages();
         }
 
         private void BuildStages()
         {
             _stages.Add(_spawnPlayerStage);
             _stages.Add(_runNetworkStage);
+        }
+
+        private async void RunStages()
+        {
+            foreach (var stage in _stages)
+            {
+                await stage.Run();
+            }
+        }
+
+        public override void OnStopServer()
+        {
+            foreach (var stage in _stages)
+            {
+                stage.Dispose();
+            }
         }
     }
 }

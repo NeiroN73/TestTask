@@ -19,20 +19,25 @@ public class RunNetworkStage : InstallerStage
     private ITickable[] _serverTickables;
     private ITickable[] _clientTickables;
     
-    public async override UniTask Initialize()
+    private ServerNetworkCreature[] _serverNetworkCreature;
+    private ClientNetworkCreature[] _clientNetworkCreature;
+    
+    public async override UniTask Run()
     {
         if (NetworkServer.active)
         {
-            _serverTickables = InitializeSide(_serverLifetimeScope, 
-                FindObjectsByType<ServerNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+            _serverNetworkCreature =
+                FindObjectsByType<ServerNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _serverTickables = InitializeSide(_serverLifetimeScope, _serverNetworkCreature);
         }
         
         if (NetworkClient.active)
         {
             if (NetworkServer.active)
             {
-                _clientTickables = InitializeSide(_clientLifetimeScope,
-                    FindObjectsByType<ClientNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+                _clientNetworkCreature =
+                    FindObjectsByType<ClientNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                _clientTickables = InitializeSide(_clientLifetimeScope, _clientNetworkCreature);
             }
             else
             {
@@ -66,7 +71,7 @@ public class RunNetworkStage : InstallerStage
         foreach (var creature in creatures)
         {
             scope.Container.Inject(creature);
-            creature.Initialize();
+            creature.TryInitialize();
         }
 
         return tickables;
@@ -87,6 +92,17 @@ public class RunNetworkStage : InstallerStage
             for (int i = 0; i < _clientTickables?.Length; i++)
             {
                 _clientTickables[i].Tick(Time.deltaTime);
+            }
+        }
+    }
+
+    public override void Dispose()
+    {
+        if (NetworkServer.active)
+        {
+            foreach (var creature in _serverNetworkCreature)
+            {
+                creature.TryDispose();
             }
         }
     }

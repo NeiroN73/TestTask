@@ -8,11 +8,12 @@ namespace Game.Components
     {
         private ChangeNameComponent _changeNameComponent;
 
-        public void Init(ControllerComponent controllerComponent, ChangeNameComponent changeNameComponent)
+        public void Init()
         {
+            var controllerComponent = Creature.GetCreatureComponentByType<ControllerComponent>();
             controllerComponent.DebugPerformed.Subscribe(SendChatMessage).AddTo(Disposable);
             
-            _changeNameComponent = changeNameComponent;
+            _changeNameComponent = Creature.GetCreatureComponentByType<ChangeNameComponent>();;
         }
         
         private void SendChatMessage()

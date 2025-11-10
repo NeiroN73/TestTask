@@ -50,7 +50,6 @@ namespace Game.UI.MainMenu
         private void OnSuccess()
         {
             _screensService.Close();
-            _gameNetworkManager.RequestPlayerSpawn(_playerName);
         }
     }
 }

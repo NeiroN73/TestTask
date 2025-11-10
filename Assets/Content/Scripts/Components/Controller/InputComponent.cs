@@ -15,7 +15,7 @@ namespace Game.Components
         public override IObservable DebugPerformed => _debugPerformed;
         public override IObservable SpawnPerformed => _spawnPerformed;
 
-        public override void Init()
+        protected override void Initialize()
         {
             _playerInputActions = new();
             _playerInputActions.Enable();

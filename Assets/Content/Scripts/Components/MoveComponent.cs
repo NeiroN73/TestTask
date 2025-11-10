@@ -9,17 +9,19 @@ namespace Game.Components
         private static readonly int Running = Animator.StringToHash("isRunning");
         
         private CharacterController _characterController;
-        private ControllerComponent _controllerComponent;
         private Animator _animator;
         private MoveData _moveData;
+        
+        private ControllerComponent _controllerComponent;
 
-        public void Init(CharacterController characterController, ControllerComponent controllerComponent,
+        public void Init(CharacterController characterController,
             MoveData moveData, Animator animator)
         {
             _characterController = characterController;
-            _controllerComponent = controllerComponent;
             _moveData = moveData;
             _animator = animator;
+            
+            _controllerComponent = Creature.GetCreatureComponentByType<ControllerComponent>();
         }
 
         public void Tick(float deltaTime)
