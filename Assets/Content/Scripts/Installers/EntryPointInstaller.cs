@@ -1,15 +1,16 @@
 using GameCore.Services;
-using UnityEngine;
 using VContainer;
 
 namespace Game.Installers
 {
-    public class EntryPointInstaller : MonoBehaviour
+    public class EntryPointInstaller : Installer
     {
         [Inject] private ScenesService _scenesService;
         
-        private async void Awake()
+        public async void Run()
         {
+            LifetimeScope.Build();
+            
             await _scenesService.LoadSceneAsync(SceneConsts.MainMenu);
         }
     }

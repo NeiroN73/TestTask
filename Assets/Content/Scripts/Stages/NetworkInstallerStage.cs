@@ -1,9 +1,9 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using Mirror;
 
 namespace Game.Stages
 {
-    public abstract class InstallerStage : MonoBehaviour
+    public abstract class NetworkInstallerStage : NetworkBehaviour
     {
         public abstract UniTask Run();
         public virtual void Dispose() {}

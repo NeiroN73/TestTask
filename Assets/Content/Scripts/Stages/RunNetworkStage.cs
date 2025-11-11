@@ -11,7 +11,7 @@ using VContainer.Unity;
 using IInitializable = GameCore.Services.IInitializable;
 using ITickable = GameCore.Services.ITickable;
 
-public class RunNetworkStage : InstallerStage
+public class RunNetworkStage : NetworkInstallerStage
 {
     [SerializeField] private ServerLifetimeScope _serverLifetimeScope;
     [SerializeField] private ClientLifetimeScope _clientLifetimeScope;

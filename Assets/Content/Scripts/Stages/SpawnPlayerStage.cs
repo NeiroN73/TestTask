@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Game.Components;
 using Game.Creatures;
 using GameCore.Factories;
 using Mirror;
@@ -6,13 +7,14 @@ using VContainer;
 
 namespace Game.Stages
 {
-    public class SpawnPlayerStage : InstallerStage
+    public class SpawnPlayerStage : NetworkInstallerStage
     {
         [Inject] private CreaturesFactory creaturesFactory;
         
         public async override UniTask Run()
         {
             NetworkServer.RegisterHandler<CreatePlayerMessage>(OnCreateCharacter);
+            RequestPlayerSpawn("Bob");
             await UniTask.CompletedTask;
         }
         
@@ -45,7 +47,7 @@ namespace Game.Stages
 
             var player = creaturesFactory.Create<PlayerServerCreature>();
             NetworkServer.AddPlayerForConnection(conn, player.gameObject);
-            player.RpcSetName(message.Name);
+            player.GetCreatureComponentByType<ChangeNameComponent>().Init(message.Name);
         }
 
         private struct CreatePlayerMessage : NetworkMessage
