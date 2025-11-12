@@ -1,10 +1,11 @@
 using Game.Configs;
+using Game.Creatures;
 using GameCore.Services;
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class MoveComponent : CreatureComponent, ITickable
+    public class MoveComponent : CreatureComponent, IServerTag, ITickable
     {
         private static readonly int Running = Animator.StringToHash("isRunning");
         
@@ -14,7 +15,7 @@ namespace Game.Components
         
         private ControllerComponent _controllerComponent;
 
-        public void Init(CharacterController characterController,
+        public void Initialize(CharacterController characterController,
             MoveData moveData, Animator animator)
         {
             _characterController = characterController;
@@ -26,12 +27,6 @@ namespace Game.Components
 
         public void Tick(float deltaTime)
         {
-            if(!isLocalPlayer)
-                return;
-
-            if (!Creature)
-                return;
-            
             var moveDirection = _controllerComponent.MoveDirection;
             
             if (moveDirection.magnitude > 0.1f)

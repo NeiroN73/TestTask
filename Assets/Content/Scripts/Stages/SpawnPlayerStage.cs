@@ -45,7 +45,7 @@ namespace Game.Stages
                 return;
             }
 
-            var player = creaturesFactory.Create<PlayerServerCreature>();
+            var player = creaturesFactory.Create<PlayerCreature>();
             NetworkServer.AddPlayerForConnection(conn, player.gameObject);
             player.GetCreatureComponentByType<ChangeNameComponent>().Init(message.Name);
         }

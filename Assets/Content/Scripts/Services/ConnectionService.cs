@@ -7,7 +7,7 @@ using VContainer;
 
 namespace Game.Services
 {
-    public class NetworkService : Service
+    public class ConnectionService : Service
     {
         [Inject] private ScreensService _screensService;
         [Inject] private ScenesService _scenesService;

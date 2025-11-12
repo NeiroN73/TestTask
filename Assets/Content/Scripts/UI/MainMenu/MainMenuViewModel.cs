@@ -15,7 +15,7 @@ namespace Game.UI.MainMenu
         [Inject] private ScenesService _scenesService;
         [Inject] private CreaturesFactory creaturesFactory;
         [Inject] private GameNetworkManager _gameNetworkManager;
-        [Inject] private NetworkService _networkService;
+        [Inject] private ConnectionService connectionService;
         
         private readonly RefTypeViewModelBinder<ReactiveCommand<string>> _playerNameInputField = new("playerName");
         private readonly RefTypeViewModelBinder<ReactiveCommand> _hostButton = new("hostButton");
@@ -39,17 +39,17 @@ namespace Game.UI.MainMenu
         
         private async void OnHostClicked()
         {
-            await _networkService.HostGameAsync(OnSuccess);
+            await connectionService.HostGameAsync(OnSuccess);
         }
         
         private async void OnJoinClicked()
         {
-            await _networkService.JoinGameAsync(OnSuccess);
+            await connectionService.JoinGameAsync(OnSuccess);
         }
 
         private void OnSuccess()
         {
-            _screensService.Close();
+            //_screensService.Close();
         }
     }
 }

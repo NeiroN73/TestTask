@@ -22,7 +22,7 @@ namespace Game.LifetimeScopes
         {
             base.RegisterServices();
             
-            Register<NetworkService>();
+            Register<ConnectionService>();
             Register(_gameNetworkManager);
         }
     }

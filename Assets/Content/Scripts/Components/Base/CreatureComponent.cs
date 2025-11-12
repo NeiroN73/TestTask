@@ -5,7 +5,7 @@ using R3;
 
 namespace Game.Components
 {
-    public abstract class CreatureComponent : NetworkBehaviour, IDisposable
+    public abstract class CreatureComponent : NetworkBehaviour
     {
         protected NetworkCreature Creature;
         protected CompositeDisposable Disposable = new();
@@ -16,20 +16,20 @@ namespace Game.Components
 
             Initialize();
         }
-
-        protected virtual void Initialize() {}
-
-        public void Dispose()
+        
+        public void TryDispose()
         {
             Disposable.Dispose();
+
+            Dispose();
         }
+        
+        protected virtual void Initialize() {}
+        protected virtual void Dispose() {}
     }
-    
-    public abstract class ClientCreatureComponent : CreatureComponent
+
+    public abstract class SubCreatureComponent : CreatureComponent
     {
-    }
-    
-    public abstract class ServerCreatureComponent : CreatureComponent
-    {
+        
     }
 }

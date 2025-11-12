@@ -16,19 +16,19 @@ public class RunNetworkStage : NetworkInstallerStage
     [SerializeField] private ServerLifetimeScope _serverLifetimeScope;
     [SerializeField] private ClientLifetimeScope _clientLifetimeScope;
     
+    private NetworkCreature[] _serverNetworkCreature;
+    private NetworkCreature[] _clientNetworkCreature;
+    
     private ITickable[] _serverTickables;
     private ITickable[] _clientTickables;
-    
-    private ServerNetworkCreature[] _serverNetworkCreature;
-    private ClientNetworkCreature[] _clientNetworkCreature;
     
     public async override UniTask Run()
     {
         if (NetworkServer.active)
         {
             _serverNetworkCreature =
-                FindObjectsByType<ServerNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            _serverTickables = InitializeSide(_serverLifetimeScope, _serverNetworkCreature);
+                FindObjectsByType<NetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            InitializeSide(_serverLifetimeScope, _serverNetworkCreature, out _serverTickables);
         }
         
         if (NetworkClient.active)
@@ -36,12 +36,12 @@ public class RunNetworkStage : NetworkInstallerStage
             if (NetworkServer.active)
             {
                 _clientNetworkCreature =
-                    FindObjectsByType<ClientNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-                _clientTickables = InitializeSide(_clientLifetimeScope, _clientNetworkCreature);
+                    FindObjectsByType<NetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                InitializeSide(_clientLifetimeScope, _clientNetworkCreature, out _clientTickables);
             }
             else
             {
-                InitializeClientForRemoteClient(NetworkClient.localPlayer.connectionToClient);
+                InitializeClientTarget(NetworkClient.localPlayer.connectionToClient);
             }
         }
         
@@ -49,13 +49,13 @@ public class RunNetworkStage : NetworkInstallerStage
     }
     
     [TargetRpc]
-    private void InitializeClientForRemoteClient(NetworkConnectionToClient conn)
+    private void InitializeClientTarget(NetworkConnectionToClient conn)
     {
-        _clientTickables = InitializeSide(_clientLifetimeScope,
-            FindObjectsByType<ClientNetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+        InitializeSide(_clientLifetimeScope,
+            FindObjectsByType<NetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None), out _clientTickables);
     }
     
-    private ITickable[] InitializeSide<T>(LifetimeScope scope, T[] creatures) where T : NetworkCreature
+    private void InitializeSide<T>(LifetimeScope scope, T[] creatures, out ITickable[] tickables) where T : NetworkCreature
     {
         scope.Build();
         
@@ -66,15 +66,13 @@ public class RunNetworkStage : NetworkInstallerStage
             initializable.Initialize();
         }
         
-        var tickables = scope.Container.Resolve<IEnumerable<ITickable>>().ToArray();
+        tickables = scope.Container.Resolve<IEnumerable<ITickable>>().ToArray();
         
         foreach (var creature in creatures)
         {
             scope.Container.Inject(creature);
             creature.TryInitialize();
         }
-
-        return tickables;
     }
     
     private void Update()
@@ -101,6 +99,14 @@ public class RunNetworkStage : NetworkInstallerStage
         if (NetworkServer.active)
         {
             foreach (var creature in _serverNetworkCreature)
+            {
+                creature.TryDispose();
+            }
+        }
+        
+        if (NetworkClient.active)
+        {
+            foreach (var creature in _clientNetworkCreature)
             {
                 creature.TryDispose();
             }

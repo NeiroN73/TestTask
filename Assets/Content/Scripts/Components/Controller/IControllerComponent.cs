@@ -8,5 +8,5 @@ namespace Game.Components
         public abstract Vector3 MoveDirection { get; protected set; }
         public abstract IObservable DebugPerformed { get; }
         public abstract IObservable SpawnPerformed { get; }
-    }
+    } 
 }

@@ -5,7 +5,7 @@ using VContainer;
 
 namespace Game.Creatures
 {
-    public class PlayerClientCreature : ClientNetworkCreature
+    public class PlayerClientCreature : SubNetworkCreature, IClientTag
     {
         [field: SerializeField] public Animator Animator { get; private set; }
         [field: SerializeField] public CharacterController CharacterController { get; private set; }
@@ -14,7 +14,12 @@ namespace Game.Creatures
 
         protected override void Initialize()
         {
-            GetCreatureComponentByType<MoveComponent>().Init(CharacterController, _playerConfig.MoveData, Animator);
+            GetCreatureComponentByType<MoveComponent>().Initialize(CharacterController, _playerConfig.MoveData, Animator);
         }
+    }
+
+    public class PlayerCreature : NetworkCreature
+    {
+        
     }
 }
