@@ -6,7 +6,7 @@ using VContainer;
 
 namespace Game.Components
 {
-    public class SpawnComponent : CreatureComponent
+    public class SpawnComponent : EntityComponent
     {
         [Inject] private CreaturesFactory creaturesFactory;
 
@@ -19,7 +19,7 @@ namespace Game.Components
         private void CmdSpawnCube()
         {
             var spawnPosition = transform.position + transform.forward * 2f;
-            var cube = creaturesFactory.Create<CubeCreature>(spawnPosition);
+            var cube = creaturesFactory.Create<CubeEntity>(spawnPosition);
             NetworkServer.Spawn(cube.gameObject);
         }
     }

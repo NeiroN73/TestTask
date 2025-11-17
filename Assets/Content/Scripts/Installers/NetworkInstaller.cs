@@ -20,6 +20,11 @@ namespace Game.Installers
         private void GatherStages()
         {
             _stages = GetComponentsInChildren<NetworkInstallerStage>().ToList();
+            
+            foreach (var stage in _stages)
+            {
+                stage.Initialize();
+            }
         }
 
         private async void RunStages()

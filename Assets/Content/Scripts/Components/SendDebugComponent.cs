@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class SendDebugComponent : CreatureComponent
+    public class SendDebugComponent : EntityComponent
     {
         private ChangeNameComponent _changeNameComponent;
 
         public void Init()
         {
-            var controllerComponent = Creature.GetCreatureComponentByType<ControllerComponent>();
+            var controllerComponent = Entity.GetEntityComponentByType<ControllerComponent>();
             controllerComponent.DebugPerformed.Subscribe(SendChatMessage).AddTo(Disposable);
             
-            _changeNameComponent = Creature.GetCreatureComponentByType<ChangeNameComponent>();;
+            _changeNameComponent = Entity.GetEntityComponentByType<ChangeNameComponent>();;
         }
         
         private void SendChatMessage()

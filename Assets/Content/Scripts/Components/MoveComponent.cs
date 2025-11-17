@@ -1,11 +1,10 @@
 using Game.Configs;
-using Game.Creatures;
 using GameCore.Services;
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class MoveComponent : CreatureComponent, IServerTag, ITickable
+    public class MoveComponent : EntityComponent, ITickable
     {
         private static readonly int Running = Animator.StringToHash("isRunning");
         
@@ -22,7 +21,7 @@ namespace Game.Components
             _moveData = moveData;
             _animator = animator;
             
-            _controllerComponent = Creature.GetCreatureComponentByType<ControllerComponent>();
+            _controllerComponent = Entity.GetEntityComponentByType<ControllerComponent>();
         }
 
         public void Tick(float deltaTime)
@@ -36,8 +35,8 @@ namespace Game.Components
                     Vector3.up
                 );
                 
-                Creature.transform.rotation = Quaternion.Slerp(
-                    Creature.transform.rotation,
+                Entity.transform.rotation = Quaternion.Slerp(
+                    Entity.transform.rotation,
                     targetRotation,
                     _moveData.RotateSpeed * Time.deltaTime
                 );

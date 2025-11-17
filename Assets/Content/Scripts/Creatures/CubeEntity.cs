@@ -1,6 +1,6 @@
 namespace Game.Creatures
 {
-    public class CubeCreature : NetworkCreature
+    public class CubeEntity : NetworkEntity
     {
         protected override void Initialize()
         {

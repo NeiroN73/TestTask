@@ -5,7 +5,7 @@ using System;
 
 namespace Game.Components
 {
-    public class ChangeNameComponent : CreatureComponent
+    public class ChangeNameComponent : EntityComponent
     {
         [SerializeField] private TMP_Text _nameText;
         

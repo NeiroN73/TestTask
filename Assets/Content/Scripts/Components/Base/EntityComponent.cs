@@ -5,14 +5,14 @@ using R3;
 
 namespace Game.Components
 {
-    public abstract class CreatureComponent : NetworkBehaviour
+    public abstract class EntityComponent : NetworkBehaviour
     {
-        protected NetworkCreature Creature;
+        protected NetworkEntity Entity;
         protected CompositeDisposable Disposable = new();
         
-        public void TryInitialize(NetworkCreature creature)
+        public void TryInitialize(NetworkEntity entity)
         {
-            Creature = creature;
+            Entity = entity;
 
             Initialize();
         }
@@ -26,10 +26,5 @@ namespace Game.Components
         
         protected virtual void Initialize() {}
         protected virtual void Dispose() {}
-    }
-
-    public abstract class SubCreatureComponent : CreatureComponent
-    {
-        
     }
 }

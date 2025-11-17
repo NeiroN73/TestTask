@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -5,6 +6,7 @@ using Game.Creatures;
 using Game.LifetimeScopes;
 using Game.Stages;
 using Mirror;
+using R3;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -16,100 +18,167 @@ public class RunNetworkStage : NetworkInstallerStage
     [SerializeField] private ServerLifetimeScope _serverLifetimeScope;
     [SerializeField] private ClientLifetimeScope _clientLifetimeScope;
     
-    private NetworkCreature[] _serverNetworkCreature;
-    private NetworkCreature[] _clientNetworkCreature;
+    [Inject] private SpawnPlayerStage _spawnPlayerStage;
     
-    private ITickable[] _serverTickables;
-    private ITickable[] _clientTickables;
+    private readonly List<NetworkBehaviour> _networkBehaviours = new();
     
+    private readonly List<IClientsTickable> _clientsTickables = new();
+    private readonly List<IClientsDisposable> _clientsDisposables = new();
+    
+    private readonly List<IServerTickable> _serverTickables = new();
+    private readonly List<IServerDisposable> _serverDisposables = new();
+    
+    private readonly List<ILocalClientTickable> _localClientTickables = new();
+    private readonly List<ILocalClientDisposable> _localClientDisposables = new();
+    
+    private readonly List<IOtherClientsTickable> _otherClientsTickables = new();
+    private readonly List<IOtherClientsDisposable> _otherClientsDisposables = new();
+
+    public override void Initialize()
+    {
+        _spawnPlayerStage.PlayerSpawned.Subscribe(PlayerSpawned).AddTo(Disposables);
+    }
+
     public async override UniTask Run()
     {
-        if (NetworkServer.active)
+        _serverLifetimeScope.Build();
+        foreach (var networkBehaviour in _networkBehaviours)
         {
-            _serverNetworkCreature =
-                FindObjectsByType<NetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            InitializeSide(_serverLifetimeScope, _serverNetworkCreature, out _serverTickables);
-        }
-        
-        if (NetworkClient.active)
-        {
-            if (NetworkServer.active)
+            if (networkBehaviour is IServerInjectable serverInjectable)
             {
-                _clientNetworkCreature =
-                    FindObjectsByType<NetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-                InitializeSide(_clientLifetimeScope, _clientNetworkCreature, out _clientTickables);
+                _serverLifetimeScope.Container.Inject(serverInjectable);
             }
-            else
+            if (networkBehaviour is IServerInitializable serverInitializable)
             {
-                InitializeClientTarget(NetworkClient.localPlayer.connectionToClient);
+                serverInitializable.ServerInitialize();
+            }
+            if (networkBehaviour is IServerTickable serverTickable)
+            {
+                _serverTickables.Add(serverTickable);
+            }
+            if (networkBehaviour is IServerDisposable serverDisposable)
+            {
+                _serverDisposables.Add(serverDisposable);
             }
         }
         
         await UniTask.CompletedTask;
     }
+
+    private void PlayerSpawned(NetworkIdentity networkIdentity)
+    {
+        InitializeClientTarget(networkIdentity.connectionToClient);
+    }
     
     [TargetRpc]
     private void InitializeClientTarget(NetworkConnectionToClient conn)
     {
-        InitializeSide(_clientLifetimeScope,
-            FindObjectsByType<NetworkCreature>(FindObjectsInactive.Include, FindObjectsSortMode.None), out _clientTickables);
-    }
-    
-    private void InitializeSide<T>(LifetimeScope scope, T[] creatures, out ITickable[] tickables) where T : NetworkCreature
-    {
-        scope.Build();
-        
-        var initializables = scope.Container.Resolve<IEnumerable<IInitializable>>();
-        
-        foreach (var initializable in initializables)
+        _clientLifetimeScope.Build();
+        foreach (var networkBehaviour in _networkBehaviours)
         {
-            initializable.Initialize();
-        }
-        
-        tickables = scope.Container.Resolve<IEnumerable<ITickable>>().ToArray();
-        
-        foreach (var creature in creatures)
-        {
-            scope.Container.Inject(creature);
-            creature.TryInitialize();
+            if (networkBehaviour is IClientsInjectable clientsInjectable)
+            {
+                _serverLifetimeScope.Container.Inject(clientsInjectable);
+            }
+            if (networkBehaviour is IClientsInitializable clientsInitializable)
+            {
+                clientsInitializable.ClientsInitialize();
+            }
+            if (networkBehaviour is IClientsTickable clientsTickable)
+            {
+                _clientsTickables.Add(clientsTickable);
+            }
+            if (networkBehaviour is IClientsDisposable clientsDisposable)
+            {
+                _clientsDisposables.Add(clientsDisposable);
+            }
+
+            if (networkBehaviour.authority)
+            {
+                if (networkBehaviour is ILocalClientInitializable localClientInitializable)
+                {
+                    localClientInitializable.LocalClientInitialize();
+                }
+                if (networkBehaviour is ILocalClientTickable localClientTickable)
+                {
+                    _localClientTickables.Add(localClientTickable);
+                }
+                if (networkBehaviour is ILocalClientDisposable localClientDisposable)
+                {
+                    _localClientDisposables.Add(localClientDisposable);
+                }
+            }
+            else
+            {
+                if (networkBehaviour is IOtherClientsInitializable otherClientsInitializable)
+                {
+                    otherClientsInitializable.OtherClientsInitialize();
+                }
+                if (networkBehaviour is IOtherClientsTickable otherClientsTickable)
+                {
+                    _otherClientsTickables.Add(otherClientsTickable);
+                }
+                if (networkBehaviour is IOtherClientsDisposable otherClientsDisposable)
+                {
+                    _otherClientsDisposables.Add(otherClientsDisposable);
+                }
+            }
         }
     }
     
     private void Update()
     {
-        if (NetworkServer.active)
+        for (int i = 0; i < _serverTickables.Count; i++)
         {
-            for (int i = 0; i < _serverTickables?.Length; i++)
-            {
-                _serverTickables[i].Tick(Time.deltaTime);
-            }
+            _serverTickables[i].ServerTick(Time.deltaTime);
         }
-        
-        if (NetworkClient.active)
+        for (int i = 0; i < _clientsTickables.Count; i++)
         {
-            for (int i = 0; i < _clientTickables?.Length; i++)
-            {
-                _clientTickables[i].Tick(Time.deltaTime);
-            }
+            _clientsTickables[i].ClientsTick(Time.deltaTime);
+        }
+        for (int i = 0; i < _localClientTickables.Count; i++)
+        {
+            _localClientTickables[i].LocalClientTick(Time.deltaTime);
+        }
+        for (int i = 0; i < _otherClientsTickables.Count; i++)
+        {
+            _otherClientsTickables[i].OtherClientsTick(Time.deltaTime);
+        }
+    }
+
+    public override void OnStopServer()
+    {
+        foreach (var serverDisposable in _serverDisposables)
+        {
+            serverDisposable.ServerDispose();
+        }
+        foreach (var otherClientsDisposable in _otherClientsDisposables)
+        {
+            otherClientsDisposable.OtherClientsDispose();
+        }
+    }
+
+    public override void OnStopClient()
+    {
+        foreach (var clientsDisposable in _clientsDisposables)
+        {
+            clientsDisposable.ClientsDispose();
+        }
+    }
+
+    public override void OnStopLocalPlayer()
+    {
+        foreach (var localClientDisposable in _localClientDisposables)
+        {
+            localClientDisposable.LocalClientDispose();
         }
     }
 
     public override void Dispose()
     {
-        if (NetworkServer.active)
+        foreach (var serverDisposable in _serverDisposables)
         {
-            foreach (var creature in _serverNetworkCreature)
-            {
-                creature.TryDispose();
-            }
-        }
-        
-        if (NetworkClient.active)
-        {
-            foreach (var creature in _clientNetworkCreature)
-            {
-                creature.TryDispose();
-            }
+            serverDisposable.ServerDispose();
         }
     }
 }
