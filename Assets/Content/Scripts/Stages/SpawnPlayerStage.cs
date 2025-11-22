@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Game.Components;
 using Game.Creatures;
+using Game.NetworkManagers;
 using GameCore.Factories;
 using Mirror;
 using R3;
@@ -11,30 +12,33 @@ namespace Game.Stages
 {
     public class SpawnPlayerStage : NetworkInstallerStage
     {
-        [Inject] private CreaturesFactory creaturesFactory;
-
-        private readonly Subject<NetworkIdentity> _playerSpawned = new();
-        private readonly Subject<NetworkIdentity> _playerDespawned = new();
-        public Observable<NetworkIdentity> PlayerSpawned => _playerSpawned;
-        public Observable<NetworkIdentity> PlayerDespawned => _playerDespawned;
+        [Inject] private CreaturesFactory _creaturesFactory;
+        [Inject] private GameNetworkManager _gameNetworkManager;
         
-        public async override UniTask Run()
+        private bool _stageCompleted;
+
+        public override void ServerInitialize()
         {
-            if (NetworkClient.active)
-            {
-                SpawnPlayerCommand(NetworkClient.localPlayer.connectionToClient, "bob");
-            }
-            await UniTask.CompletedTask;
+            _gameNetworkManager.ClientConnected.Subscribe(OnPlayerSpawned).AddTo(Disposables);
+        }
+
+        public async override UniTask ServerRun()
+        {
+            await UniTask.WaitUntil(() => _stageCompleted);
+        }
+
+        private void OnPlayerSpawned(NetworkConnectionToClient conn)
+        {
+            SpawnPlayerCommand(conn, "bob");
         }
         
-        [Command(requiresAuthority = false)]
         private void SpawnPlayerCommand(NetworkConnectionToClient conn, string playerName)
         {
-            var player = creaturesFactory.Create<PlayerEntity>();
+            var player = _creaturesFactory.Create<PlayerClientEntity>();
             NetworkServer.AddPlayerForConnection(conn, player.gameObject);
             player.GetEntityComponentByType<ChangeNameComponent>().Init(playerName);
-            var networkIdentity = player.GetComponent<NetworkIdentity>();
-            _playerSpawned.OnNext(networkIdentity);
+
+            _stageCompleted = true;
         }
     }
 }

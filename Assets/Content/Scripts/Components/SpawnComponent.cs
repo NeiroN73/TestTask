@@ -10,9 +10,9 @@ namespace Game.Components
     {
         [Inject] private CreaturesFactory creaturesFactory;
 
-        public void Init(ControllerComponent controllerComponent)
+        public void Init(ControllerComponentParent controllerComponentParent)
         {
-            controllerComponent.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
+            controllerComponentParent.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
         }
 
         [Command]

@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public abstract class ControllerComponent : EntityComponent
+    public abstract class ControllerComponentParent : NetworkParent
     {
-        public abstract Vector3 MoveDirection { get; protected set; }
-        public abstract IObservable DebugPerformed { get; }
-        public abstract IObservable SpawnPerformed { get; }
-    } 
+        public abstract Vector3 MoveDirection { get; }
+        public abstract Observer DebugPerformed { get; }
+        public abstract Observer SpawnPerformed { get; }
+    }
 }

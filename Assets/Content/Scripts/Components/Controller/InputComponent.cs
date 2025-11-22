@@ -1,21 +1,27 @@
-using GameCore.Utils;
+using Game.Creatures;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Game.Components
 {
-    public class InputComponent : ControllerComponent
+    public class InputComponent : ControllerComponentParent
+    {
+        public InputLocalClientComponent LocalClient { get; set; }
+
+        public override Vector3 MoveDirection => LocalClient.MoveDirection;
+        public override Observer DebugPerformed => LocalClient.DebugPerformed;
+        public override Observer SpawnPerformed => LocalClient.SpawnPerformed;
+    }
+    
+    public class InputLocalClientComponent : ILocalClientInitializable
     {
         private PlayerInputActions _playerInputActions;
         
-        public override Vector3 MoveDirection { get; protected set; }
+        public Vector3 MoveDirection { get; private set; }
+        public Observer DebugPerformed { get; } = new();
+        public Observer SpawnPerformed { get; } = new();
         
-        private readonly Subject _debugPerformed = new();
-        private readonly Subject _spawnPerformed = new();
-        public override IObservable DebugPerformed => _debugPerformed;
-        public override IObservable SpawnPerformed => _spawnPerformed;
-
-        protected override void Initialize()
+        public void LocalClientInitialize()
         {
             _playerInputActions = new();
             _playerInputActions.Enable();
@@ -24,31 +30,23 @@ namespace Game.Components
             _playerInputActions.Defaultactionmap.Spawn.performed += SpawnOnPerformed;
             _playerInputActions.Defaultactionmap.Move.performed += MoveOnPerformed;
             _playerInputActions.Defaultactionmap.Move.canceled += MoveOnPerformed;
+            
         }
-
+        
         private void MoveOnPerformed(InputAction.CallbackContext obj)
         {
-            if (!isLocalPlayer) 
-                return;
-
             var value = obj.ReadValue<Vector2>();
             MoveDirection = new Vector3(value.x, 0, value.y);
         }
 
         private void SpawnOnPerformed(InputAction.CallbackContext obj)
         {
-            if (!isLocalPlayer) 
-                return;
-            
-            _spawnPerformed.OnNext();
+            SpawnPerformed.Publish();
         }
 
         private void DebugOnPerformed(InputAction.CallbackContext obj)
         {
-            if (!isLocalPlayer) 
-                return;
-            
-            _debugPerformed.OnNext();
+            DebugPerformed.Publish();
         }
     }
 }

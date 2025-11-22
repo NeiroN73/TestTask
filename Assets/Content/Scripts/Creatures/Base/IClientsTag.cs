@@ -29,9 +29,9 @@
         void ClientsInitialize();
     }
 
-    public interface IClientsTickable
+    public interface IClientTickable
     {
-        void ClientsTick(float deltaTime);
+        void ClientTick(float deltaTime);
     }
 
     public interface IClientsDisposable

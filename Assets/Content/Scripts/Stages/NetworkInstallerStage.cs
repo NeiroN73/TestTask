@@ -8,8 +8,7 @@ namespace Game.Stages
     {
         protected CompositeDisposable Disposables = new CompositeDisposable();
 
-        public virtual void Initialize() {}
-        public abstract UniTask Run();
-        public virtual void Dispose() {}
+        public virtual void ServerInitialize() {}
+        public abstract UniTask ServerRun();
     }
 }

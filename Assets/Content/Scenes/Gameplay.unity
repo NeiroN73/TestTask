@@ -318,7 +318,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1255951523}
   - component: {fileID: 1255951525}
-  - component: {fileID: 1255951524}
   m_Layer: 0
   m_Name: Stages
   m_TagString: Untagged
@@ -341,23 +340,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2009856748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1255951524
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1255951522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c91f57caa6d441d79f2b01a00a107a00, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RunNetworkStage
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  _serverLifetimeScope: {fileID: 1327898216}
-  _clientLifetimeScope: {fileID: 1327898215}
 --- !u!114 &1255951525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,6 +406,7 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects:
   - {fileID: 2009856746}
+  _installerStages: []
 --- !u!114 &1327898215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -600,6 +583,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _serverLifetimeScope: {fileID: 1327898216}
+  _clientLifetimeScope: {fileID: 1327898215}
 --- !u!4 &2009856748
 Transform:
   m_ObjectHideFlags: 0
