@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FishNet.Object;
 using Game.Components;
 using GameCore.Creatures;
-using Mirror;
+
 using R3;
+using TriInspector;
 using UnityEngine;
 
 namespace Game.Creatures

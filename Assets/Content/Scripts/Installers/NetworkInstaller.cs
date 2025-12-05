@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using FishNet.Connection;
+using FishNet.Object;
 using Game.Creatures;
 using Game.LifetimeScopes;
 using Game.NetworkManagers;
 using Game.Stages;
-using Mirror;
+
 using R3;
 using UnityEngine;
 using VContainer;
@@ -15,8 +17,6 @@ namespace Game.Installers
     {
         [SerializeField] private ServerLifetimeScope _serverLifetimeScope;
         [SerializeField] private ClientLifetimeScope _clientLifetimeScope;
-        
-        [Inject] private GameNetworkManager _gameNetworkManager;
         
         private readonly List<NetworkInstallerStage> _stages = new();
         private readonly List<NetworkBehaviour> _networkBehaviours = new();
@@ -30,10 +30,10 @@ namespace Game.Installers
         
         public override void OnStartServer()
         {
-            DontDestroyOnLoad(this);
+            //DontDestroyOnLoad(this);
 
-            _gameNetworkManager.ClientConnected.Subscribe(OnClientConnected).AddTo(_disposable);
-            _gameNetworkManager.ClientDisconnected.Subscribe(OnClientDisconnected).AddTo(_disposable);
+            // _gameNetworkManager.ClientConnected.Subscribe(OnClientConnected).AddTo(_disposable);
+            // _gameNetworkManager.ClientDisconnected.Subscribe(OnClientDisconnected).AddTo(_disposable);
             
             _serverLifetimeScope.Build();
             foreach (var networkBehaviour in _networkBehaviours)
@@ -75,13 +75,13 @@ namespace Game.Installers
             }
         }
 
-        private void OnClientConnected(NetworkConnectionToClient networkConnectionToClient)
+        private void OnClientConnected(NetworkConnection NetworkConnection)
         {
-            InitializeClientTarget(networkConnectionToClient);
+            InitializeClientTarget(NetworkConnection);
         }
         
         [TargetRpc]
-        private void InitializeClientTarget(NetworkConnectionToClient conn)
+        private void InitializeClientTarget(NetworkConnection conn)
         {
             _clientLifetimeScope.Build();
             foreach (var networkBehaviour in _networkBehaviours)
@@ -99,7 +99,7 @@ namespace Game.Installers
                     _clientTickables.Add(clientsTickable);
                 }
 
-                if (networkBehaviour.authority)
+                if (networkBehaviour.IsController)
                 {
                     if (networkBehaviour is ILocalClientInitializable localClientInitializable)
                     {
@@ -144,7 +144,7 @@ namespace Game.Installers
             }
         }
 
-        private void OnClientDisconnected(NetworkConnectionToClient networkConnectionToClient)
+        private void OnClientDisconnected(NetworkConnection NetworkConnection)
         {
         }
     }

@@ -1,7 +1,8 @@
-using Mirror;
 using TMPro;
 using UnityEngine;
 using System;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 namespace Game.Components
 {
@@ -9,7 +10,7 @@ namespace Game.Components
     {
         [SerializeField] private TMP_Text _nameText;
         
-        [SyncVar(hook = nameof(OnUsernameChanged))]
+        //[SyncVar(OnChange = nameof(OnUsernameChanged))]
         private string _userName;
 
         public string UserName => _userName;
@@ -30,14 +31,14 @@ namespace Game.Components
             }
         }
         
-        [ClientRpc]
+        [ObserversRpc]
         public void Init(string username)
         {
-            if (isServer)
+            if (IsServerInitialized)
             {
                 SetUsername(username);
             }
-            else if (authority)
+            else if (IsController)
             {
                 CmdSetUsername(username);
             }
@@ -54,7 +55,7 @@ namespace Game.Components
             _userName = username;
         }
         
-        [Command]
+        [ServerRpc]
         private void CmdSetUsername(string newUsername)
         {
             SetUsername(newUsername);

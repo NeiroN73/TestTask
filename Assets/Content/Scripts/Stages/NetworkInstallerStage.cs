@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using Mirror;
+using FishNet.Object;
 using R3;
 
 namespace Game.Stages

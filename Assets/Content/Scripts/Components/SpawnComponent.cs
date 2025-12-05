@@ -1,6 +1,7 @@
+using FishNet.Object;
 using Game.Creatures;
 using GameCore.Factories;
-using Mirror;
+
 using R3;
 using VContainer;
 
@@ -15,12 +16,12 @@ namespace Game.Components
             controllerComponentParent.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
         }
 
-        [Command]
+        [ServerRpc]
         private void CmdSpawnCube()
         {
             var spawnPosition = transform.position + transform.forward * 2f;
             var cube = creaturesFactory.Create<CubeEntity>(spawnPosition);
-            NetworkServer.Spawn(cube.gameObject);
+            Spawn(cube.gameObject);
         }
     }
 }

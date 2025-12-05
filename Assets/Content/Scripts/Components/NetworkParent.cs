@@ -1,4 +1,4 @@
-﻿using Mirror;
+﻿using FishNet.Object;
 using R3;
 
 namespace Game.Components

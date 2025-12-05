@@ -14,7 +14,6 @@ namespace Game.UI.MainMenu
         [Inject] private ScreensService _screensService;
         [Inject] private ScenesService _scenesService;
         [Inject] private CreaturesFactory creaturesFactory;
-        [Inject] private GameNetworkManager _gameNetworkManager;
         [Inject] private ConnectionService connectionService;
         
         private readonly RefTypeViewModelBinder<ReactiveCommand<string>> _playerNameInputField = new("playerName");

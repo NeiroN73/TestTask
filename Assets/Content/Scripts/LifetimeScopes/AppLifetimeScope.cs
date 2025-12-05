@@ -1,4 +1,3 @@
-using Game.NetworkManagers;
 using Game.Services;
 using GameCore.LifetimeScopes;
 using UnityEngine;
@@ -9,7 +8,6 @@ namespace Game.LifetimeScopes
     public class AppLifetimeScope : CoreLifetimeScope
     {
         [SerializeField] private AssetLabelReference _gameConfigsAssetLabel;
-        [SerializeField] private GameNetworkManager _gameNetworkManager;
         
         protected override void RegisterConfigs()
         {
@@ -23,7 +21,6 @@ namespace Game.LifetimeScopes
             base.RegisterServices();
             
             Register<ConnectionService>();
-            Register(_gameNetworkManager);
         }
     }
 }

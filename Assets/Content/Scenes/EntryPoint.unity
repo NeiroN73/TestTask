@@ -571,7 +571,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentReference:
     TypeName: Game.LifetimeScopes.AppLifetimeScope
-  autoRun: 1
+  autoRun: 0
   autoInjectGameObjects:
   - {fileID: 572965947}
 --- !u!1 &1166938099
@@ -628,7 +628,6 @@ MonoBehaviour:
     m_LabelString: coreConfigs
   _gameConfigsAssetLabel:
     m_LabelString: gameConfigs
-  _gameNetworkManager: {fileID: 1217102848}
 --- !u!1 &1217102844
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,8 +637,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1217102845}
-  - component: {fileID: 1217102848}
-  - component: {fileID: 1217102847}
+  - component: {fileID: 1217102846}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -662,7 +660,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1217102847
+--- !u!114 &1217102846
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -671,72 +669,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1217102844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Script: {fileID: 11500000, guid: d2c95dfde7d73b54dbbdc23155d35d36, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  port: 7777
-  DualMode: 1
-  NoDelay: 1
-  Interval: 10
-  Timeout: 10000
-  RecvBufferSize: 7361536
-  SendBufferSize: 7361536
-  FastResend: 2
-  ReceiveWindowSize: 4096
-  SendWindowSize: 4096
-  MaxRetransmit: 40
-  MaximizeSocketBuffers: 1
-  ReliableMaxMessageSize: 297433
-  UnreliableMaxMessageSize: 1194
-  debugLog: 0
-  statisticsGUI: 0
-  statisticsLog: 0
---- !u!114 &1217102848
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1217102844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d3c209f7ad24cbf8d72c1fddd6d36d5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  headlessStartMode: 0
-  editorAutoStart: 0
-  sendRate: 60
-  offlineScene: Assets/Content/Scenes/MainMenu.unity
-  onlineScene: Assets/Content/Scenes/Gameplay.unity
-  offlineSceneLoadDelay: 0
-  transport: {fileID: 1217102847}
-  networkAddress: localhost
-  maxConnections: 100
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 952076547882031899, guid: e433445c1ec8d2c4dbc61db7e80bab56, type: 3}
-  autoCreatePlayer: 0
-  playerSpawnMethod: 1
-  spawnPrefabs:
-  - {fileID: 5480446781180356138, guid: c7f57c2105b99484eb5122402a480a7e, type: 3}
-  exceptionsDisconnect: 1
-  snapshotSettings:
-    bufferTimeMultiplier: 2
-    bufferLimit: 32
-    catchupNegativeThreshold: -1
-    catchupPositiveThreshold: 1
-    catchupSpeed: 0.019999999552965164
-    slowdownSpeed: 0.03999999910593033
-    driftEmaDuration: 1
-    dynamicAdjustment: 1
-    dynamicAdjustmentTolerance: 1
-    deliveryTimeEmaDuration: 2
-  evaluationMethod: 0
-  evaluationInterval: 3
-  timeInterpolationGui: 0
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Managing.NetworkManager
+  _refreshDefaultPrefabs: 0
+  _runInBackground: 1
+  _dontDestroyOnLoad: 1
+  _objectPool: {fileID: 0}
+  _persistence: 0
+  _logging: {fileID: 0}
+  _spawnablePrefabs: {fileID: 11400000, guid: 921b31a94d55a0144b72d133f283f69f, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

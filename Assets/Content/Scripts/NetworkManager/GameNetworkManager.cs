@@ -1,23 +1,25 @@
-using Mirror;
+
+using FishNet.Connection;
+using FishNet.Managing;
 using R3;
 
 namespace Game.NetworkManagers
 {
-    public class GameNetworkManager : NetworkManager
+    public class GameNetworkManager// : NetworkManager
     {
-        private readonly Subject<NetworkConnectionToClient> _clientConnected = new();
-        private readonly Subject<NetworkConnectionToClient> _clientDisconnected = new();
-        public Observable<NetworkConnectionToClient> ClientConnected => _clientConnected;
-        public Observable<NetworkConnectionToClient> ClientDisconnected => _clientDisconnected;
+        private readonly Subject<NetworkConnection> _clientConnected = new();
+        private readonly Subject<NetworkConnection> _clientDisconnected = new();
+        public Observable<NetworkConnection> ClientConnected => _clientConnected;
+        public Observable<NetworkConnection> ClientDisconnected => _clientDisconnected;
         
-        public override void OnServerConnect(NetworkConnectionToClient conn)
-        {
-            _clientConnected.OnNext(conn);
-        }
-
-        public override void OnServerDisconnect(NetworkConnectionToClient conn)
-        {
-            _clientDisconnected.OnNext(conn);
-        }
+        // public override void OnServerConnect(NetworkConnection conn)
+        // {
+        //     _clientConnected.OnNext(conn);
+        // }
+        //
+        // public override void OnServerDisconnect(NetworkConnection conn)
+        // {
+        //     _clientDisconnected.OnNext(conn);
+        // }
     }
 }

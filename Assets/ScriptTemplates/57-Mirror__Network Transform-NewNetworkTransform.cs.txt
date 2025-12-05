@@ -1,7 +1,7 @@
 #define onlySyncOnChange_BANDWIDTH_SAVING
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
+
 
 /*
     Documentation: https://mirror-networking.gitbook.io/docs/components/network-transform

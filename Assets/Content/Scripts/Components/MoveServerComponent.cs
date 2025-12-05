@@ -1,6 +1,6 @@
+using FishNet.Object;
 using Game.Configs;
 using Game.Creatures;
-using Mirror;
 using R3;
 using UnityEngine;
 
@@ -95,7 +95,7 @@ namespace Game.Components
             Server.Moved.Subscribe(MoveClientRpc).AddTo(Disposable);
         }
         
-        [ClientRpc]
+        [ObserversRpc]
         public void MoveClientRpc(bool isMoving, Vector3 position, Quaternion rotation)
         {
             Client.UpdateVisualMove(isMoving, position, rotation);

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Mirror;
+
 using UnityEngine;
 
 /*
@@ -35,14 +35,14 @@ public class #SCRIPTNAME# : NetworkAuthenticator
     /// Called on server from OnServerConnectInternal when a client needs to authenticate
     /// </summary>
     /// <param name="conn">Connection to client.</param>
-    public override void OnServerAuthenticate(NetworkConnectionToClient conn) { }
+    public override void OnServerAuthenticate(NetworkConnection conn) { }
 
     /// <summary>
     /// Called on server when the client's AuthRequestMessage arrives
     /// </summary>
     /// <param name="conn">Connection to client.</param>
     /// <param name="msg">The message payload</param>
-    public void OnAuthRequestMessage(NetworkConnectionToClient conn, AuthRequestMessage msg)
+    public void OnAuthRequestMessage(NetworkConnection conn, AuthRequestMessage msg)
     {
         AuthResponseMessage authResponseMessage = new AuthResponseMessage();
         conn.Send(authResponseMessage);

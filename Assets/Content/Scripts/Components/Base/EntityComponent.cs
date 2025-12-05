@@ -1,6 +1,5 @@
-using System;
+using FishNet.Object;
 using Game.Creatures;
-using Mirror;
 using R3;
 
 namespace Game.Components

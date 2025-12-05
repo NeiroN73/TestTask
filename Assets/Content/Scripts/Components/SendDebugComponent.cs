@@ -1,5 +1,5 @@
-using Mirror;
-using R3;
+
+using FishNet.Object;
 using UnityEngine;
 
 namespace Game.Components
@@ -10,15 +10,15 @@ namespace Game.Components
 
         public void Init()
         {
-            var controllerComponent = Entity.GetEntityComponentByType<ControllerComponentParent>();
-            controllerComponent.DebugPerformed.Subscribe(SendChatMessage).AddTo(Disposable);
+            //var controllerComponent = Entity.GetEntityComponentByType<ControllerComponentParent>();
+            //controllerComponent.DebugPerformed.Subscribe(SendChatMessage).AddTo(Disposable);
             
             _changeNameComponent = Entity.GetEntityComponentByType<ChangeNameComponent>();;
         }
         
         private void SendChatMessage()
         {
-            if (isServer)
+            if (IsServerInitialized)
             {
                 RpcReceiveChatMessage(_changeNameComponent.UserName);
             }
@@ -28,13 +28,13 @@ namespace Game.Components
             }
         }
         
-        [Command]
+        [ServerRpc]
         private void CmdSendChatMessage(string sender)
         {
             RpcReceiveChatMessage(sender);
         }
         
-        [ClientRpc]
+        [ObserversRpc]
         private void RpcReceiveChatMessage(string sender)
         {
             Debug.Log($"Привет от {sender}");
