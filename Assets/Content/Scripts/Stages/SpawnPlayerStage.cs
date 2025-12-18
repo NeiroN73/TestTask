@@ -1,12 +1,7 @@
-using System;
 using Cysharp.Threading.Tasks;
 using FishNet.Connection;
-using Game.Components;
 using Game.Creatures;
-using Game.NetworkManagers;
 using GameCore.Factories;
-
-using R3;
 using VContainer;
 
 namespace Game.Stages
@@ -34,9 +29,8 @@ namespace Game.Stages
         
         private void SpawnPlayerCommand(NetworkConnection conn, string playerName)
         {
-            var player = _creaturesFactory.Create<PlayerClientEntity>();
-            //NetworkServer.AddPlayerForConnection(conn, player.gameObject);
-            player.GetEntityComponentByType<ChangeNameComponent>().Init(playerName);
+            var player = _creaturesFactory.Create<PlayerBehaviour>();
+            NetworkManager.ServerManager.Spawn(player.gameObject, conn);
 
             _stageCompleted = true;
         }

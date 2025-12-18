@@ -1,12 +1,11 @@
-using GameCore.Utils;
 using UnityEngine;
 
 namespace Game.Components
 {
-    public abstract class ControllerComponentParent : NetworkParent
+    public abstract class ControllerElement : NetworkElement
     {
-        public abstract Vector3 MoveDirection { get; }
-        public abstract Observer DebugPerformed { get; }
-        public abstract Observer SpawnPerformed { get; }
+        public Observer<Vector3> MoveInputed { get; } = new();
+        public Observer DebugPerformed { get; } = new();
+        public Observer SpawnPerformed { get; } = new();
     }
 }

@@ -13,7 +13,7 @@ namespace Game.Components
             //var controllerComponent = Entity.GetEntityComponentByType<ControllerComponentParent>();
             //controllerComponent.DebugPerformed.Subscribe(SendChatMessage).AddTo(Disposable);
             
-            _changeNameComponent = Entity.GetEntityComponentByType<ChangeNameComponent>();;
+            //_changeNameComponent = Behaviour.GetEntityComponentByType<ChangeNameComponent>();;
         }
         
         private void SendChatMessage()

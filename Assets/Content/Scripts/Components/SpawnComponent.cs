@@ -11,16 +11,16 @@ namespace Game.Components
     {
         [Inject] private CreaturesFactory creaturesFactory;
 
-        public void Init(ControllerComponentParent controllerComponentParent)
+        public void Init(ControllerElement controllerElement)
         {
-            controllerComponentParent.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
+            controllerElement.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
         }
 
         [ServerRpc]
         private void CmdSpawnCube()
         {
             var spawnPosition = transform.position + transform.forward * 2f;
-            var cube = creaturesFactory.Create<CubeEntity>(spawnPosition);
+            var cube = creaturesFactory.Create<CubeBehaviour>(spawnPosition);
             Spawn(cube.gameObject);
         }
     }

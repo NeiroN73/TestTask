@@ -35,7 +35,7 @@ namespace Game.UI.MainMenu
         {
             _playerName = playerName;
         }
-        
+         
         private async void OnHostClicked()
         {
             await connectionService.HostGameAsync(OnSuccess);

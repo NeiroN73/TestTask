@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Content.Scripts.EventBus;
+using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using FishNet.Object;
+using FishNet.Transporting;
 using Game.Creatures;
 using Game.LifetimeScopes;
 using Game.NetworkManagers;
@@ -30,10 +33,7 @@ namespace Game.Installers
         
         public override void OnStartServer()
         {
-            //DontDestroyOnLoad(this);
-
-            // _gameNetworkManager.ClientConnected.Subscribe(OnClientConnected).AddTo(_disposable);
-            // _gameNetworkManager.ClientDisconnected.Subscribe(OnClientDisconnected).AddTo(_disposable);
+            NetworkManager.ServerManager.OnRemoteConnectionState += OnRemoteConnectionStateChanged;
             
             _serverLifetimeScope.Build();
             foreach (var networkBehaviour in _networkBehaviours)
@@ -56,6 +56,25 @@ namespace Game.Installers
             RunStages();
         }
 
+        private void OnRemoteConnectionStateChanged(NetworkConnection networkConnection, RemoteConnectionStateArgs remoteConnectionStateArgs)
+        {
+            if (remoteConnectionStateArgs.ConnectionState == RemoteConnectionState.Started)
+            {
+                Debug.Log($"Клиент подключился: {networkConnection.ClientId}");
+                OnClientConnected(networkConnection);
+            }
+            else if (remoteConnectionStateArgs.ConnectionState == RemoteConnectionState.Stopped)
+            {
+                Debug.Log($"Клиент отключился: {networkConnection.ClientId}");
+                OnClientDisconnected(networkConnection);
+            }
+        }
+        
+        private void OnClientConnected(NetworkConnection networkConnection)
+        {
+            InitializeClientTarget(networkConnection);
+        }
+        
         private void GatherStages()
         {
             _stages.Clear();
@@ -73,11 +92,6 @@ namespace Game.Installers
             {
                 await stage.ServerRun();
             }
-        }
-
-        private void OnClientConnected(NetworkConnection NetworkConnection)
-        {
-            InitializeClientTarget(NetworkConnection);
         }
         
         [TargetRpc]
@@ -143,8 +157,8 @@ namespace Game.Installers
                 _otherClientsTickables[i].OtherClientsTick(Time.deltaTime);
             }
         }
-
-        private void OnClientDisconnected(NetworkConnection NetworkConnection)
+        
+        private void OnClientDisconnected(NetworkConnection networkConnection)
         {
         }
     }

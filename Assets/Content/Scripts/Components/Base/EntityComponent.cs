@@ -6,12 +6,12 @@ namespace Game.Components
 {
     public abstract class EntityComponent : NetworkBehaviour
     {
-        protected NetworkEntity Entity;
+        protected BaseNetworkBehaviour Behaviour;
         protected CompositeDisposable Disposable = new();
         
-        public void TryInitialize(NetworkEntity entity)
+        public void TryInitialize(BaseNetworkBehaviour behaviour)
         {
-            Entity = entity;
+            Behaviour = behaviour;
 
             Initialize();
         }
