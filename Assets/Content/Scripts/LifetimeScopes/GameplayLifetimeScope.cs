@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Content.Scripts.EventBus;
 using Game.Stages;
 using GameCore.LifetimeScopes;
 using UnityEngine;
@@ -15,6 +16,11 @@ namespace Game.LifetimeScopes
             {
                 Register(stage);
             }
+        }
+
+        protected override void RegisterServices()
+        {
+            Register<NetworkEventBus>();
         }
     }
 }

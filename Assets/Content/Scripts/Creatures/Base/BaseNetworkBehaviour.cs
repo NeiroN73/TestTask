@@ -9,7 +9,7 @@ namespace Game.Creatures
 {
     public abstract class BaseNetworkBehaviour : NetworkBehaviour, ICreature
     {
-        [field: SerializeField] public string Id { get; private set; }
+        public string Id { get; private set; }
         
         protected List<NetworkElement> Elements = new();
         protected CompositeDisposable Disposable = new();
@@ -20,5 +20,10 @@ namespace Game.Creatures
         }
 
         public abstract void Initialize();
+
+        public void Initialize(string id)
+        {
+            Id = id;
+        }
     }
 }

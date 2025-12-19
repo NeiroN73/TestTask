@@ -1,14 +1,12 @@
 using Cysharp.Threading.Tasks;
-using FishNet.Object;
 using R3;
 
 namespace Game.Stages
 {
-    public abstract class NetworkInstallerStage : NetworkBehaviour
+    public abstract class NetworkInstallerStage
     {
-        protected CompositeDisposable Disposables = new CompositeDisposable();
+        protected CompositeDisposable Disposable = new();
 
-        public virtual void ServerInitialize() {}
-        public abstract UniTask ServerRun();
+        public abstract UniTask Run();
     }
 }

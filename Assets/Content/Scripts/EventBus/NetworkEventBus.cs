@@ -1,113 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using FishNet.Object;
+using FishNet;
+using FishNet.Broadcast;
 using FishNet.Connection;
-using R3;
-using UnityEngine;
+using FishNet.Transporting;
+using GameCore.Services;
 
 namespace Content.Scripts.EventBus
 {
-    public sealed class NetworkEventBus : NetworkBehaviour, IDisposable
+    public sealed class NetworkEventBus : Service
     {
-        private readonly Dictionary<long, object> _subjects = new();
+        private readonly Dictionary<Type, HashSet<object>> _subscriptionsByType = new();
 
-        // Type-safe подписка
-        public Observable<T> Subscribe<T>() where T : struct, INetworkEvent
+        public void SubscribeOnServer<T>(Action<NetworkConnection, T, Channel> action) where T : struct, IBroadcast
         {
-            var id = NetworkEventId<T>.Id;
-
-            if (!_subjects.TryGetValue(id, out var subject))
+            var type = typeof(T);
+            
+            if (!_subscriptionsByType.TryGetValue(type, out var subscriptions))
             {
-                subject = new Subject<T>();
-                _subjects.Add(id, subject);
+                subscriptions = new HashSet<object>();
+                _subscriptionsByType[type] = subscriptions;
+                InstanceFinder.ServerManager.RegisterBroadcast(action);
             }
-
-            return (Subject<T>)subject;
+            else
+            {
+                subscriptions.Add(action);
+            }
+        }
+        
+        public void SubscribeOnClients<T>(Action<T, Channel> action) where T : struct, IBroadcast
+        {
+            var type = typeof(T);
+            
+            if (!_subscriptionsByType.TryGetValue(type, out var subscriptions))
+            {
+                subscriptions = new HashSet<object>();
+                _subscriptionsByType[type] = subscriptions;
+                InstanceFinder.ClientManager.RegisterBroadcast(action);
+            }
+            else
+            {
+                subscriptions.Add(action);
+            }
         }
 
-        // Локальная публикация
-        public void Publish<T>(T evt) where T : struct, INetworkEvent
+        public void UnsubscribeOnServer<T>(Action<NetworkConnection, T, Channel> action) where T : struct, IBroadcast
         {
-            var id = NetworkEventId<T>.Id;
-            if (_subjects.TryGetValue(id, out var subject))
-                ((Subject<T>)subject).OnNext(evt);
+            var type = typeof(T);
+            if (_subscriptionsByType.TryGetValue(type, out var subscriptions))
+            {
+                subscriptions.Remove(action);
+                if (subscriptions.Count == 0)
+                {
+                    InstanceFinder.ServerManager.UnregisterBroadcast(action);
+                    _subscriptionsByType.Remove(type);
+                }
+            }
+        }
+        
+        public void UnsubscribeOnClients<T>(Action<T, Channel> action) where T : struct, IBroadcast
+        {
+            var type = typeof(T);
+            if (_subscriptionsByType.TryGetValue(type, out var subscriptions))
+            {
+                subscriptions.Remove(action);
+                if (subscriptions.Count == 0)
+                {
+                    InstanceFinder.ClientManager.UnregisterBroadcast(action);
+                    _subscriptionsByType.Remove(type);
+                }
+            }
         }
 
-        // ----------------------------
-        // Конкретные RPC под PlayerMovedEvent
-        // ----------------------------
-
-        [ServerRpc(RequireOwnership = false)]
-        public void PublishServerPlayerMoved(PlayerMovedEvent evt)
+        public void PublishServerRpc<T>(T message, Channel channel = Channel.Reliable) where T : struct, IBroadcast
         {
-            PublishObserversPlayerMoved(evt);
+            if (_subscriptionsByType.ContainsKey(typeof(T)))
+            {
+                InstanceFinder.ClientManager.Broadcast(message, channel: channel);
+            }
         }
 
-        [ObserversRpc]
-        private void PublishObserversPlayerMoved(PlayerMovedEvent evt)
+        public void PublishClientsRpc<T>(T message, Channel channel = Channel.Reliable) where T : struct, IBroadcast
         {
-            Publish(evt);
+            if (_subscriptionsByType.ContainsKey(typeof(T)))
+            {
+                InstanceFinder.ServerManager.Broadcast(message, channel: channel);
+            }
         }
 
-        [TargetRpc]
-        private void PublishTargetPlayerMoved(NetworkConnection target, PlayerMovedEvent evt)
+        public void PublishTargetRpc<T>(NetworkConnection connection, T message, Channel channel = Channel.Reliable)
+            where T : struct, IBroadcast
         {
-            Publish(evt);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        public void PublishTargetFromServerPlayerMoved(PlayerMovedEvent evt, NetworkConnection target)
-        {
-            PublishTargetPlayerMoved(target, evt);
-        }
-
-        // ----------------------------
-
-        public override void OnStopNetwork()
-        {
-            Dispose();
-            base.OnStopNetwork();
-        }
-
-        public void Dispose()
-        {
-            foreach (var s in _subjects.Values)
-                if (s is IDisposable d)
-                    d.Dispose();
-
-            _subjects.Clear();
-        }
-    }
-
-    public interface INetworkEvent { }
-
-    public struct PlayerMovedEvent : INetworkEvent
-    {
-        public Vector3 Position;
-
-        public PlayerMovedEvent(Vector3 position)
-        {
-            Position = position;
-        }
-    }
-
-    internal static class NetworkEventId<T>
-    {
-        private static long _nextId;
-        public static readonly long Id = Interlocked.Increment(ref _nextId);
-    }
-
-    public static class NetworkEventBusExtensions
-    {
-        public static void SendToServerPlayerMoved(this NetworkEventBus bus, PlayerMovedEvent evt)
-        {
-            bus.PublishServerPlayerMoved(evt);
-        }
-
-        public static void SendToClientPlayerMoved(this NetworkEventBus bus, PlayerMovedEvent evt, NetworkConnection target)
-        {
-            bus.PublishTargetFromServerPlayerMoved(evt, target);
+            if (_subscriptionsByType.ContainsKey(typeof(T)))
+            {
+                InstanceFinder.ServerManager.Broadcast(connection, message, channel: channel);
+            }
         }
     }
 }

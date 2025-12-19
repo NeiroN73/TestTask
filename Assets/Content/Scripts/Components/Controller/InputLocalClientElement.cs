@@ -8,7 +8,7 @@ namespace Game.Components
     {
         private PlayerInputActions _playerInputActions;
         
-        public void LocalClientInitialize()
+        public void Initialize()
         {
             _playerInputActions = new();
             _playerInputActions.Enable();

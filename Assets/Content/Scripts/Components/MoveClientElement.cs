@@ -22,15 +22,7 @@ namespace Game.Components
             _animator = animator;
         }
 
-        public void UpdateVisualMove(bool isMoving, Vector3 position, Quaternion rotation)
-        {
-            _position = position;
-            _rotation = rotation;
-        
-            _animator.SetBool(_running, isMoving);
-        }
-
-        public void ClientTick(float deltaTime)
+        public void Tick(float deltaTime)
         {
             _transform.position = _position;
             _transform.rotation = _rotation;
@@ -38,6 +30,14 @@ namespace Game.Components
             _characterController.Move(_direction * deltaTime);
             
             var isMoving = _direction.magnitude > 0.1f;
+            _animator.SetBool(_running, isMoving);
+        }
+        
+        public void UpdateVisualMove(bool isMoving, Vector3 position, Quaternion rotation)
+        {
+            _position = position;
+            _rotation = rotation;
+        
             _animator.SetBool(_running, isMoving);
         }
     }

@@ -20,7 +20,7 @@ namespace Game.Components
             _moveData = moveData;
         }
 
-        public void ServerTick(float deltaTime)
+        public void Tick(float deltaTime)
         {
             if (_moveDirection.magnitude > 0.1f)
             {
@@ -42,7 +42,7 @@ namespace Game.Components
             
             Moved.Publish(isMoving, _transform.position, _transform.rotation);
         }
-
+        
         public void SetMoveDirection(Vector3 moveDirection)
         {
             _moveDirection = moveDirection;

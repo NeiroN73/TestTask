@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Content.Scripts.EventBus;
 using FishNet;
 using FishNet.Broadcast;
 using FishNet.Connection;
+using FishNet.Transporting;
 using Game.Creatures;
 using GameCore.Configs;
 using GameCore.Creatures;
@@ -17,45 +19,48 @@ namespace Content.Scripts.Factories
     public class NetworkBehavioursServerFactory : Factory, IServerInjectable, IServerInitializable
     {
         [Inject] private IObjectResolver _objectResolver;
-        [Inject] private CreaturesConfig _creaturesConfig;
+        [Inject] private BehavioursConfig behavioursConfig;
         [Inject] private AssetsLoaderService _assetsLoaderService;
+        [Inject] private NetworkEventBus _networkEventBus;
 
-        private Dictionary<string, ICreature> _creaturesById;
-        private Dictionary<Type, ICreature> _creaturesByType;
+        private Dictionary<string, BaseNetworkBehaviour> _behavioursById;
 
-        public void ServerInitialize()
+        public void Initialize()
         {
-            _creaturesById = new();
-            _creaturesByType = new();
+            _behavioursById = new();
         
-            foreach (var handler in _creaturesConfig.Creatures)
+            foreach (var handler in behavioursConfig.Behaviours)
             {
                 if (handler == null) continue;
 
-                var asset = _assetsLoaderService.LoadAssetSync<ICreature>(handler.Asset); //TODO: сделать прелоадом
+                var behaviour = _assetsLoaderService.LoadAssetSync<BaseNetworkBehaviour>(handler.Asset); //TODO: сделать прелоадом
                 
-                if (!string.IsNullOrEmpty(asset.Id))
-                    _creaturesById[asset.Id] = asset;
-                
-                _creaturesByType[asset.GetType()] = asset;
+                if (!string.IsNullOrEmpty(handler.Id))
+                    _behavioursById[handler.Id] = behaviour;
             }
+            
+            _networkEventBus.SubscribeOnClients<BehaviourSpawnClientRequestBroadcast>(OnBehaviourSpawned);
         }
-
-        public TCreature Create<TCreature>(string id, NetworkConnection conn, Vector3 position = default, Quaternion rotation = default, Transform parent = null) 
-            where TCreature : MonoBehaviour, ICreature
+        
+        private void OnBehaviourSpawned(BehaviourSpawnClientRequestBroadcast broadcast, Channel channel)
         {
-            var prefab = GetCreatureById<TCreature>(id);
-            if (prefab == null)
-                throw new InvalidOperationException($"Creature with ID '{id}' and type {typeof(TCreature)} not found in config");
-
-            return Create(prefab, conn, position, rotation, parent);
+            var behaviour = Create(broadcast.Id, broadcast.NetworkConnection,
+                broadcast.Position, broadcast.Rotation, broadcast.Parent);
+            
+            var spawnedObjectArgs = new BehaviourSpawnServerResponseBroadcast
+            {
+                SpawnedObject = behaviour.gameObject
+            };
+            
+            _networkEventBus.PublishTargetRpc(broadcast.NetworkConnection, spawnedObjectArgs);
         }
-
-        public TCreature Create<TCreature>(TCreature prefab, NetworkConnection conn, Vector3 position = default, Quaternion rotation = default, Transform parent = null) 
-            where TCreature : MonoBehaviour, ICreature
+        
+        public BaseNetworkBehaviour Create(string id, NetworkConnection conn, Vector3 position = default,
+            Quaternion rotation = default, Transform parent = null)
         {
+            var prefab = GetCreatureById(id);
             if (prefab == null)
-                throw new ArgumentNullException(nameof(prefab));
+                throw new InvalidOperationException($"Creature with ID '{id}' not found in config");
 
             var creature = Object.Instantiate(prefab, position, rotation, parent);
             InstanceFinder.ServerManager.Spawn(creature.gameObject, conn);
@@ -63,14 +68,13 @@ namespace Content.Scripts.Factories
             return creature;
         }
         
-        private TCreature GetCreatureById<TCreature>(string id) where TCreature : MonoBehaviour
+        private BaseNetworkBehaviour GetCreatureById(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
         
-            if (_creaturesById.TryGetValue(id, out var creature) && 
-                creature is TCreature typedCreature)
+            if (_behavioursById.TryGetValue(id, out var creature))
             {
-                return typedCreature;
+                return creature;
             }
             return null;
         }
@@ -82,12 +86,17 @@ namespace Content.Scripts.Factories
         }
     }
 
-    public struct BehaviourSpawnArgs : IBroadcast
+    public struct BehaviourSpawnClientRequestBroadcast : IBroadcast
     {
         public string Id;
         public NetworkConnection NetworkConnection;
         public Vector3 Position;
         public Quaternion Rotation;
         public Transform Parent;
+    }
+    
+    public struct BehaviourSpawnServerResponseBroadcast : IBroadcast
+    {
+        public GameObject SpawnedObject;
     }
 }
