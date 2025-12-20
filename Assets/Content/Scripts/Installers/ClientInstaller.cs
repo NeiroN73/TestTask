@@ -18,10 +18,11 @@ namespace Game.Installers
         private void InitializeClientTarget(NetworkConnection conn)
         {
             _clientLifetimeScope.Build();
-            this.ProcessInterfacesFromContainer(_clientLifetimeScope);
-            this.ProcessInterfaces(Behaviours, _clientLifetimeScope);
+            NetworkObjectInitializeUtils.InitializeObjectsFromContainer(_clientLifetimeScope, IsController);
+            NetworkObjectInitializeUtils.InitializeClientObjects(Behaviours, _clientLifetimeScope, IsController);
             ConfigureStages();
-            this.ProcessInterfaces(Stages, _clientLifetimeScope);
+            NetworkObjectInitializeUtils.InitializeClientObjects(Stages, _clientLifetimeScope, IsController);
+            RunTick(_clientLifetimeScope, Time.deltaTime);
             RunStages();
         }
     }

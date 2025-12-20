@@ -3,7 +3,7 @@ using GameCore.Services;
 
 namespace Game.Creatures
 {
-    public interface IClientsInjectable
+    public interface IClientInjectable
     {
     }
 
@@ -11,7 +11,7 @@ namespace Game.Creatures
     {
     }
     
-    public interface IClientsInitializable : IInitializable
+    public interface IClientInitializable : IInitializable
     {
     }
 
@@ -19,7 +19,7 @@ namespace Game.Creatures
     {
     }
 
-    public interface IClientsDisposable : IDisposable
+    public interface IClientDisposable : IDisposable
     {
     }
     

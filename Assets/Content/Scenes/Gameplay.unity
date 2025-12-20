@@ -359,7 +359,6 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects:
   - {fileID: 2009856746}
-  _installerStages: []
 --- !u!114 &1327898215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,7 +530,7 @@ Transform:
   m_GameObject: {fileID: 1564805166}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.93572, y: -0.06500006, z: 0.93572}
+  m_LocalPosition: {x: 0.93572, y: -1.53, z: 0.93572}
   m_LocalScale: {x: 5.51, y: 0.13, z: 8.26}
   m_ConstrainProportionsScale: 0
   m_Children: []

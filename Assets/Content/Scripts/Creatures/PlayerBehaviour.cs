@@ -7,7 +7,7 @@ using VContainer;
 
 namespace Game.Creatures
 {
-    public class PlayerBehaviour : BaseNetworkBehaviour, IClientsInjectable
+    public class PlayerBehaviour : BaseNetworkBehaviour, IClientInjectable
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private CharacterController _characterController;
@@ -18,28 +18,35 @@ namespace Game.Creatures
         private MoveClientElement _moveClientElement;
         private ControllerElement _controllerElement;
         
-        public override void Initialize()
+        protected override void ServerInitialize()
         {
             _moveServerElement = new MoveServerElement(transform, _characterController, _playerConfig.MoveData);
+            
+            ServerInitializeElements(_moveServerElement);
+            
+            _moveServerElement.Moved.Subscribe(OnMovedObserversRpc).AddTo(Disposable);
+        }
+
+        protected override void ClientInitialize()
+        {
             _moveClientElement = new MoveClientElement(transform, _characterController, _animator);
             _controllerElement = new InputLocalClientElement();
             
-            AddElements(_moveServerElement, _moveClientElement, _controllerElement);
+            ClientInitializeElements(_moveClientElement, _controllerElement);
             
-            _moveServerElement.Moved.Subscribe(OnMovedObserversRpc).AddTo(Disposable);
             _controllerElement.MoveInputed.Subscribe(OnMoveInputedServerRpc).AddTo(Disposable);
         }
-        
+
         [ObserversRpc]
         private void OnMovedObserversRpc(bool isMoving, Vector3 position, Quaternion rotation)
         {
-            _moveClientElement.UpdateVisualMove(isMoving, position, rotation);
+            _moveClientElement?.UpdateVisualMove(isMoving, position, rotation);
         }
 
         [ServerRpc]
         private void OnMoveInputedServerRpc(Vector3 direction)
         {
-            _moveServerElement.SetMoveDirection(direction);
+            _moveServerElement?.SetMoveDirection(direction);
         }
     }
 }

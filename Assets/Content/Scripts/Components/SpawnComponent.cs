@@ -20,8 +20,8 @@ namespace Game.Components
         private void CmdSpawnCube()
         {
             var spawnPosition = transform.position + transform.forward * 2f;
-            var cube = creaturesFactory.Create<CubeBehaviour>(spawnPosition);
-            Spawn(cube.gameObject);
+            //var cube = creaturesFactory.Create<CubeBehaviour>(spawnPosition);
+            //Spawn(cube.gameObject);
         }
     }
 }

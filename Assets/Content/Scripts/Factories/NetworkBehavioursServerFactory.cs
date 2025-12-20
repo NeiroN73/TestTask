@@ -6,6 +6,7 @@ using FishNet.Broadcast;
 using FishNet.Connection;
 using FishNet.Transporting;
 using Game.Creatures;
+using Game.LifetimeScopes;
 using GameCore.Configs;
 using GameCore.Creatures;
 using GameCore.Factories;
@@ -16,12 +17,12 @@ using Object = UnityEngine.Object;
 
 namespace Content.Scripts.Factories
 {
-    public class NetworkBehavioursServerFactory : Factory, IServerInjectable, IServerInitializable
+    public class NetworkBehavioursServerFactory : NetworkFactory, IServerInjectable, IServerInitializable
     {
-        [Inject] private IObjectResolver _objectResolver;
-        [Inject] private BehavioursConfig behavioursConfig;
+        [Inject] private ServerLifetimeScope _serverLifetimeScope;
+        [Inject] private BehavioursConfig _behavioursConfig;
         [Inject] private AssetsLoaderService _assetsLoaderService;
-        [Inject] private NetworkEventBus _networkEventBus;
+        [Inject] private ServerEventBus _serverEventBus;
 
         private Dictionary<string, BaseNetworkBehaviour> _behavioursById;
 
@@ -29,7 +30,7 @@ namespace Content.Scripts.Factories
         {
             _behavioursById = new();
         
-            foreach (var handler in behavioursConfig.Behaviours)
+            foreach (var handler in _behavioursConfig.Behaviours)
             {
                 if (handler == null) continue;
 
@@ -39,10 +40,10 @@ namespace Content.Scripts.Factories
                     _behavioursById[handler.Id] = behaviour;
             }
             
-            _networkEventBus.SubscribeOnClients<BehaviourSpawnClientRequestBroadcast>(OnBehaviourSpawned);
+            _serverEventBus.ServerSubscribe<BehaviourSpawnClientRequestBroadcast>(OnBehaviourSpawned).AddTo(Disposable);
         }
         
-        private void OnBehaviourSpawned(BehaviourSpawnClientRequestBroadcast broadcast, Channel channel)
+        private void OnBehaviourSpawned(BehaviourSpawnClientRequestBroadcast broadcast)
         {
             var behaviour = Create(broadcast.Id, broadcast.NetworkConnection,
                 broadcast.Position, broadcast.Rotation, broadcast.Parent);
@@ -52,7 +53,7 @@ namespace Content.Scripts.Factories
                 SpawnedObject = behaviour.gameObject
             };
             
-            _networkEventBus.PublishTargetRpc(broadcast.NetworkConnection, spawnedObjectArgs);
+            _serverEventBus.PublishTargetRpc(broadcast.NetworkConnection, spawnedObjectArgs);
         }
         
         public BaseNetworkBehaviour Create(string id, NetworkConnection conn, Vector3 position = default,
@@ -64,7 +65,7 @@ namespace Content.Scripts.Factories
 
             var creature = Object.Instantiate(prefab, position, rotation, parent);
             InstanceFinder.ServerManager.Spawn(creature.gameObject, conn);
-            InitializeCreature(creature);
+            InitializeBehaviour(creature);
             return creature;
         }
         
@@ -79,10 +80,11 @@ namespace Content.Scripts.Factories
             return null;
         }
         
-        public void InitializeCreature<TCreature>(TCreature creature)
-            where TCreature : MonoBehaviour, ICreature
+        public void InitializeBehaviour<TBehaviour>(TBehaviour behaviour)
+            where TBehaviour : BaseNetworkBehaviour
         {
-            _objectResolver.Inject(creature);
+            _serverLifetimeScope.Container.Inject(behaviour);
+            behaviour.TryServerInitialize(_serverLifetimeScope);
         }
     }
 

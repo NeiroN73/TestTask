@@ -4,15 +4,18 @@ using Content.Scripts.EventBus;
 using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using Game.Creatures;
-using GameCore.Factories;
+using Game.LifetimeScopes;
 using UnityEngine;
 using VContainer;
 
 namespace Content.Scripts.Factories
 {
-    public class NetworkBehavioursClientFactory : Factory
+    public class NetworkBehavioursClientFactory : NetworkFactory, IClientInjectable
     {
-        [Inject] private NetworkEventBus _networkEventBus;
+        [Inject] private ClientEventBus _clientEventBus;
+        [Inject] private ClientLifetimeScope _clientLifetimeScope;
+        
+        private UniTaskCompletionSource<BaseNetworkBehaviour> _completionSource;
         
         public async UniTask<T> RequestCreateAsync<T>(
             string id, 
@@ -23,6 +26,8 @@ namespace Content.Scripts.Factories
             CancellationToken cancellationToken = default) 
             where T : BaseNetworkBehaviour
         {
+            _completionSource = new();
+            
             var spawnArgs = new BehaviourSpawnClientRequestBroadcast
             {
                 Id = id,
@@ -32,27 +37,33 @@ namespace Content.Scripts.Factories
                 Parent = parent
             };
             
-            var completionSource = new UniTaskCompletionSource<T>();
+            _clientEventBus.ClientsSubscribe<BehaviourSpawnServerResponseBroadcast>(OnBehaviourSpawnServerResponsedBroadcast).AddTo(Disposable);
+            _clientEventBus.PublishServerRpc(spawnArgs);
             
-            _networkEventBus.SubscribeOnClients<BehaviourSpawnServerResponseBroadcast>(
-                (response, channel) =>
-                {
-                    if (response.SpawnedObject && response.SpawnedObject is T spawnedObject)
-                    {
-                        completionSource.TrySetResult(spawnedObject);
-                    }
-                    else
-                    {
-                        completionSource.TrySetException(
-                            new InvalidCastException($"Cannot cast spawned object to {typeof(T).Name}"));
-                    }
-                });
+            var result = await _completionSource.Task.WithCancellation(cancellationToken);
+            result.TryClientInitialize(_clientLifetimeScope);
             
-            _networkEventBus.PublishServerRpc(spawnArgs);
-            
-            var result = await completionSource.Task.WithCancellation(cancellationToken);
-            
-            return result;
+            if (result is T typedResult)
+            {
+                return typedResult;
+            }
+            else
+            {
+                throw new InvalidCastException($"Cannot cast spawned object to {typeof(T).Name}");
+            }
+        }
+        
+        private void OnBehaviourSpawnServerResponsedBroadcast(BehaviourSpawnServerResponseBroadcast broadcast)
+        {
+            if (broadcast.SpawnedObject)
+            {
+                _completionSource.TrySetResult(broadcast.SpawnedObject.GetComponent<BaseNetworkBehaviour>());
+            }
+            else
+            {
+                _completionSource.TrySetException(
+                    new InvalidCastException($"Cannot cast spawned object to BaseNetworkBehaviour"));
+            }
         }
     }
 }

@@ -24,22 +24,27 @@ namespace Game.Components
         {
             if (_moveDirection.magnitude > 0.1f)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(
-                    new Vector3(_moveDirection.x, 0, _moveDirection.z), 
-                    Vector3.up
-                );
-            
-                _transform.rotation = Quaternion.Slerp(
-                    _transform.rotation,
-                    targetRotation,
-                    _moveData.RotateSpeed * Time.deltaTime
-                );
-            }
+                Vector3 horizontalDirection = new Vector3(_moveDirection.x, 0, _moveDirection.z);
         
-            _moveDirection *= _moveData.MoveSpeed;
-            _characterController.Move(_moveDirection * Time.deltaTime);
+                if (horizontalDirection.sqrMagnitude > 0.001f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(
+                        horizontalDirection.normalized, 
+                        Vector3.up
+                    );
+        
+                    _transform.rotation = Quaternion.Slerp(
+                        _transform.rotation,
+                        targetRotation,
+                        _moveData.RotateSpeed * deltaTime
+                    );
+                }
+            }
+    
+            Vector3 velocity = _moveDirection * _moveData.MoveSpeed;
+            _characterController.Move(velocity * deltaTime);
+    
             var isMoving = _moveDirection.magnitude > 0.1f;
-            
             Moved.Publish(isMoving, _transform.position, _transform.rotation);
         }
         

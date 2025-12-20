@@ -16,9 +16,9 @@ namespace Game.LifetimeScopes
             RegisterConfigs(_gameConfigsAssetLabel);
         }
         
-        protected override void RegisterServices()
+        protected override void RegisterSystems()
         {
-            base.RegisterServices();
+            base.RegisterSystems();
             
             Register<ConnectionService>();
         }

@@ -4,13 +4,13 @@ namespace Game.Installers
 {
     public class GameplayClientInstaller : ClientInstaller
     {
-        private PlayerClientSpawnRequestStage _playerClientSpawnRequestStage;
+        private PlayerSpawnRequestClientStage playerSpawnRequestClientStage;
 
         protected override void ConfigureStages()
         {
-            _playerClientSpawnRequestStage = new PlayerClientSpawnRequestStage(Owner);
+            playerSpawnRequestClientStage = new PlayerSpawnRequestClientStage(LocalConnection);
             
-            AddStages(_playerClientSpawnRequestStage);
+            AddStages(playerSpawnRequestClientStage);
         }
     }
 }

@@ -1,29 +1,48 @@
 using System.Collections.Generic;
 using FishNet.Object;
 using Game.Components;
-using GameCore.Creatures;
+using Game.Installers;
+using Game.LifetimeScopes;
 using R3;
-using UnityEngine;
 
 namespace Game.Creatures
 {
-    public abstract class BaseNetworkBehaviour : NetworkBehaviour, ICreature
+    public abstract class BaseNetworkBehaviour : NetworkBehaviour
     {
-        public string Id { get; private set; }
+        private ServerLifetimeScope _serverLifetimeScope;
+        private ClientLifetimeScope _clientLifetimeScope;
         
-        protected List<NetworkElement> Elements = new();
+        private List<NetworkElement> _elements = new();
+        
         protected CompositeDisposable Disposable = new();
-
-        protected void AddElements(params NetworkElement[] elements)
+        
+        public void TryServerInitialize(ServerLifetimeScope scope)
         {
-            Elements.AddRange(elements);
+            _serverLifetimeScope = scope;
+            ServerInitialize();
         }
-
-        public abstract void Initialize();
-
-        public void Initialize(string id)
+        
+        public void TryClientInitialize(ClientLifetimeScope scope)
         {
-            Id = id;
+            _clientLifetimeScope = scope;
+            ClientInitialize();
+        }
+        
+        protected virtual void ServerInitialize() {}
+        protected virtual void ClientInitialize() {}
+        
+        protected void ServerInitializeElements(params NetworkElement[] elements)
+        {
+            _elements.AddRange(elements);
+            
+            NetworkObjectInitializeUtils.InitializeServerObjects(_elements, _serverLifetimeScope);
+        }
+        
+        protected void ClientInitializeElements(params NetworkElement[] elements)
+        {
+            _elements.AddRange(elements);
+            
+            NetworkObjectInitializeUtils.InitializeClientObjects(_elements, _clientLifetimeScope, IsController);
         }
     }
 }

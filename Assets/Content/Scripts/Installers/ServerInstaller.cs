@@ -10,10 +10,11 @@ namespace Game.Installers
         public override void OnStartServer()
         {
             _serverLifetimeScope.Build();
-            this.ProcessInterfacesFromContainer(_serverLifetimeScope);
-            this.ProcessInterfaces(Behaviours, _serverLifetimeScope);
+            NetworkObjectInitializeUtils.InitializeObjectsFromContainer(_serverLifetimeScope);
+            NetworkObjectInitializeUtils.InitializeServerObjects(Behaviours, _serverLifetimeScope);
             ConfigureStages();
-            this.ProcessInterfaces(Stages, _serverLifetimeScope);
+            NetworkObjectInitializeUtils.InitializeServerObjects(Stages, _serverLifetimeScope);
+            RunTick(_serverLifetimeScope, Time.deltaTime);
             RunStages();
         }
     }
