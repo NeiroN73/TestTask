@@ -1,4 +1,5 @@
 using Game.Creatures;
+using Game.Events;
 using UnityEngine;
 
 namespace Game.Components
@@ -8,7 +9,7 @@ namespace Game.Components
         public void Tick(float deltaTime)
         {
             var moveDirection = new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), Random.Range(-10, 10));
-            MoveInputed.Publish(moveDirection);
+            BehaviourEventBus.Publish(new MoveInputedEvent {Direction = moveDirection});
         }
     }
 }

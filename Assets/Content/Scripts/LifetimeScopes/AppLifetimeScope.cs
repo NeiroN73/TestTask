@@ -20,6 +20,8 @@ namespace Game.LifetimeScopes
         {
             base.RegisterSystems();
             
+            Register<PlayerState>();
+            
             Register<ConnectionService>();
         }
     }

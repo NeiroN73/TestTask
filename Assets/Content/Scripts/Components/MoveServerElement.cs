@@ -1,23 +1,30 @@
+using Content.Scripts.EventBus;
+using FishNet.Connection;
 using Game.Configs;
 using Game.Creatures;
+using Game.Events;
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class MoveServerElement : NetworkElement, IServerTickable
+    public class MoveServerElement : ServerNetworkElement, IServerTickable
     {
+        private NetworkConnection _networkConnection;
         private readonly Transform _transform;
         private readonly CharacterController _characterController;
         private readonly MoveData _moveData;
         private Vector3 _moveDirection;
-        
-        public Observer<bool, Vector3, Quaternion> Moved = new();
         
         public MoveServerElement(Transform transform, CharacterController characterController, MoveData moveData)
         {
             _transform = transform;
             _characterController = characterController;
             _moveData = moveData;
+        }
+
+        public override void InvokeSubscribes()
+        {
+            BehaviourEventBus.ServerSubscribe<MoveInputedEvent>(OnSettedMoveDirection).AddDisposable(Disposable);
         }
 
         public void Tick(float deltaTime)
@@ -45,12 +52,19 @@ namespace Game.Components
             _characterController.Move(velocity * deltaTime);
     
             var isMoving = _moveDirection.magnitude > 0.1f;
-            Moved.Publish(isMoving, _transform.position, _transform.rotation);
+            
+            BehaviourEventBus.PublishTargetRpc(_networkConnection, new MovedOnServerEvent
+            {
+                IsMoved = isMoving,
+                Position = _transform.position,
+                Rotation = _transform.rotation
+            });
         }
         
-        public void SetMoveDirection(Vector3 moveDirection)
+        public void OnSettedMoveDirection(MoveInputedEvent e)
         {
-            _moveDirection = moveDirection;
+            _networkConnection = e.NetworkConnection;
+            _moveDirection = e.Direction;
         }
     }
 }

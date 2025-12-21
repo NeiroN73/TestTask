@@ -40,7 +40,7 @@ namespace Content.Scripts.Factories
                     _behavioursById[handler.Id] = behaviour;
             }
             
-            _serverEventBus.ServerSubscribe<BehaviourSpawnClientRequestBroadcast>(OnBehaviourSpawned).AddTo(Disposable);
+            _serverEventBus.ServerSubscribe<BehaviourSpawnClientRequestBroadcast>(OnBehaviourSpawned).AddDisposable(Disposable);
         }
         
         private void OnBehaviourSpawned(BehaviourSpawnClientRequestBroadcast broadcast)
@@ -84,7 +84,7 @@ namespace Content.Scripts.Factories
             where TBehaviour : BaseNetworkBehaviour
         {
             _serverLifetimeScope.Container.Inject(behaviour);
-            behaviour.TryServerInitialize(_serverLifetimeScope);
+            behaviour.TryInitialize();
         }
     }
 

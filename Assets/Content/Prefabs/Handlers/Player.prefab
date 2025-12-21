@@ -202,6 +202,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 0}
   _animator: {fileID: 5202413193679753000}
   _characterController: {fileID: 8948568845466506890}
+  _userNameText: {fileID: 7131392454668018468}
 --- !u!1 &1233020742779370945
 GameObject:
   m_ObjectHideFlags: 0

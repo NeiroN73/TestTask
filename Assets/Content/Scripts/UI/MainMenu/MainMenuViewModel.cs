@@ -15,6 +15,7 @@ namespace Game.UI.MainMenu
         [Inject] private ScenesService _scenesService;
         [Inject] private CreaturesFactory creaturesFactory;
         [Inject] private ConnectionService connectionService;
+        [Inject] private PlayerState _playerState;
         
         private readonly RefTypeViewModelBinder<ReactiveCommand<string>> _playerNameInputField = new("playerName");
         private readonly RefTypeViewModelBinder<ReactiveCommand> _hostButton = new("hostButton");
@@ -34,6 +35,7 @@ namespace Game.UI.MainMenu
         private void OnPlayerNameChanged(string playerName)
         {
             _playerName = playerName;
+            _playerState.Username = playerName;
         }
          
         private async void OnHostClicked()

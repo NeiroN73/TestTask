@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using FishNet;
 using FishNet.Broadcast;
 using FishNet.Connection;
@@ -11,20 +10,12 @@ namespace Content.Scripts.EventBus
     {
         public NetworkEventHandler ServerSubscribe<T>(Action<T> action) where T : struct, IBroadcast
         {
-            var type = typeof(T);
-            if (SubscriptionsByType.TryGetValue(type, out var subscriptions))
-            {
-                subscriptions.Add(action);
-            }
-            else
-            {
-                SubscriptionsByType[type] = new List<Delegate> { action };
-            }
+            UpdateSubscribes(action);
             
             void Handler(NetworkConnection c, T t, Channel ch) => InvokeSubscribes(t);
             InstanceFinder.ServerManager.RegisterBroadcast((Action<NetworkConnection, T, Channel>)Handler, false);
             
-            return new NetworkEventHandler(action, this, type);
+            return new NetworkEventHandler(action, this, typeof(T));
         }
         
         public void PublishClientsRpc<T>(T message, Channel channel = Channel.Reliable) where T : struct, IBroadcast

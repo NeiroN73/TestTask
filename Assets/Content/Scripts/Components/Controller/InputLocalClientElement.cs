@@ -1,4 +1,6 @@
+using FishNet.Connection;
 using Game.Creatures;
+using Game.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,7 +8,13 @@ namespace Game.Components
 {
     public class InputLocalClientElement : ControllerElement, ILocalClientInitializable
     {
+        private readonly NetworkConnection _networkConnection;
         private PlayerInputActions _playerInputActions;
+
+        public InputLocalClientElement(NetworkConnection networkConnection)
+        {
+            _networkConnection = networkConnection;
+        }
         
         public void Initialize()
         {
@@ -23,7 +31,11 @@ namespace Game.Components
         {
             var value = obj.ReadValue<Vector2>();
             var moveDirection = new Vector3(value.x, 0, value.y);
-            MoveInputed.Publish(moveDirection);
+            BehaviourEventBus.PublishServerRpc(new MoveInputedEvent
+            {
+                NetworkConnection = _networkConnection,
+                Direction = moveDirection
+            });
         }
 
         private void SpawnOnPerformed(InputAction.CallbackContext obj)

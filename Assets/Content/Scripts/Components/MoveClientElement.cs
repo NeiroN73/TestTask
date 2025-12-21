@@ -1,12 +1,13 @@
+using Content.Scripts.EventBus;
 using Game.Creatures;
+using Game.Events;
 using UnityEngine;
 
 namespace Game.Components
 {
-    public class MoveClientElement : NetworkElement, IClientTickable
+    public class MoveClientElement : ClientNetworkElement, IClientTickable
     {
         private readonly Transform _transform;
-        private readonly CharacterController _characterController;
         private readonly Animator _animator;
         
         private readonly int _running = Animator.StringToHash("isRunning");
@@ -15,30 +16,29 @@ namespace Game.Components
         private Vector3 _position;
         private Quaternion _rotation;
 
-        public MoveClientElement(Transform transform, CharacterController characterController, Animator animator)
+        public MoveClientElement(Transform transform, Animator animator)
         {
             _transform = transform;
-            _characterController = characterController;
             _animator = animator;
+        }
+
+        public override void InvokeSubscribes()
+        {
+            BehaviourEventBus.ClientSubscribe<MovedOnServerEvent>(UpdateVisualMove).AddDisposable(Disposable);
         }
 
         public void Tick(float deltaTime)
         {
             _transform.position = _position;
             _transform.rotation = _rotation;
-            
-            _characterController.Move(_direction * deltaTime);
-            
-            var isMoving = _direction.magnitude > 0.1f;
-            _animator.SetBool(_running, isMoving);
         }
         
-        public void UpdateVisualMove(bool isMoving, Vector3 position, Quaternion rotation)
+        public void UpdateVisualMove(MovedOnServerEvent e)
         {
-            _position = position;
-            _rotation = rotation;
+            _position = e.Position;
+            _rotation = e.Rotation;
         
-            _animator.SetBool(_running, isMoving);
+            _animator.SetBool(_running, e.IsMoved);
         }
     }
 }

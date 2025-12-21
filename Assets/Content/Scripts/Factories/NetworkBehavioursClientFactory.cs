@@ -28,20 +28,17 @@ namespace Content.Scripts.Factories
         {
             _completionSource = new();
             
-            var spawnArgs = new BehaviourSpawnClientRequestBroadcast
+            _clientEventBus.ClientSubscribe<BehaviourSpawnServerResponseBroadcast>(OnBehaviourSpawnServerResponsedBroadcast).AddDisposable(Disposable);
+            _clientEventBus.PublishServerRpc(new BehaviourSpawnClientRequestBroadcast
             {
                 Id = id,
                 NetworkConnection = networkConnection,
                 Position = position,
                 Rotation = rotation,
                 Parent = parent
-            };
-            
-            _clientEventBus.ClientsSubscribe<BehaviourSpawnServerResponseBroadcast>(OnBehaviourSpawnServerResponsedBroadcast).AddTo(Disposable);
-            _clientEventBus.PublishServerRpc(spawnArgs);
+            });
             
             var result = await _completionSource.Task.WithCancellation(cancellationToken);
-            result.TryClientInitialize(_clientLifetimeScope);
             
             if (result is T typedResult)
             {

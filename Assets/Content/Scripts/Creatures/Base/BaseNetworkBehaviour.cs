@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using Content.Scripts.EventBus;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using Game.Components;
 using Game.Installers;
 using Game.LifetimeScopes;
 using R3;
+using VContainer.Unity;
 
 namespace Game.Creatures
 {
@@ -14,33 +17,67 @@ namespace Game.Creatures
         
         private List<NetworkElement> _elements = new();
         
+        private readonly bool _isServerInitialized;
+        private readonly bool _isClientInitialized;
+        
         protected CompositeDisposable Disposable = new();
         
-        public void TryServerInitialize(ServerLifetimeScope scope)
+        protected ServerEventBus ServerBehaviourEventBus;
+        protected ClientEventBus ClientBehaviourEventBus;
+
+        public void TryInitialize()
         {
-            _serverLifetimeScope = scope;
+            TryServerInitialize();
+            TryClientInitialize();
+        }
+        
+        public void TryServerInitialize()
+        {
+            _serverLifetimeScope = LifetimeScope.Find<ServerLifetimeScope>() as ServerLifetimeScope;
+            ServerBehaviourEventBus = new();
             ServerInitialize();
         }
         
-        public void TryClientInitialize(ClientLifetimeScope scope)
+        [ObserversRpc]
+        public void TryClientInitialize()
         {
-            _clientLifetimeScope = scope;
+            _clientLifetimeScope = LifetimeScope.Find<ClientLifetimeScope>() as ClientLifetimeScope;
+            ClientBehaviourEventBus = new();
             ClientInitialize();
         }
+
+        protected virtual void ServerInitialize()
+        {
+        }
         
-        protected virtual void ServerInitialize() {}
-        protected virtual void ClientInitialize() {}
+        protected virtual void ClientInitialize()
+        {
+        }
         
-        protected void ServerInitializeElements(params NetworkElement[] elements)
+        protected void ServerInitializeElements(params ServerNetworkElement[] elements)
         {
             _elements.AddRange(elements);
+            
+            foreach (var element in elements)
+            {
+                element.Initialize(ServerBehaviourEventBus);
+                element.InvokeSubscribes();
+                element.InvokePublishes();
+            }
             
             NetworkObjectInitializeUtils.InitializeServerObjects(_elements, _serverLifetimeScope);
         }
         
-        protected void ClientInitializeElements(params NetworkElement[] elements)
+        protected void ClientInitializeElements(params ClientNetworkElement[] elements)
         {
             _elements.AddRange(elements);
+            
+            foreach (var element in elements)
+            {
+                element.Initialize(ClientBehaviourEventBus);
+                element.InvokeSubscribes();
+                element.InvokePublishes();
+            }
             
             NetworkObjectInitializeUtils.InitializeClientObjects(_elements, _clientLifetimeScope, IsController);
         }

@@ -1,7 +1,6 @@
-﻿using FishNet.Object;
-using Game.Components;
+﻿using Game.Components;
 using Game.Configs;
-using R3;
+using TMPro;
 using UnityEngine;
 using VContainer;
 
@@ -11,42 +10,30 @@ namespace Game.Creatures
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private CharacterController _characterController;
+
+        [SerializeField] private TMP_Text _userNameText; //temp test
         
         [Inject] private PlayerConfig _playerConfig;
         
-        private MoveServerElement _moveServerElement;
-        private MoveClientElement _moveClientElement;
-        private ControllerElement _controllerElement;
-        
         protected override void ServerInitialize()
         {
-            _moveServerElement = new MoveServerElement(transform, _characterController, _playerConfig.MoveData);
+            var moveServerElement = new MoveServerElement(transform, _characterController, _playerConfig.MoveData);
+            var changeNameServerElement = new ChangeNameServerElement();
             
-            ServerInitializeElements(_moveServerElement);
-            
-            _moveServerElement.Moved.Subscribe(OnMovedObserversRpc).AddTo(Disposable);
+            ServerInitializeElements(moveServerElement, changeNameServerElement);
         }
 
         protected override void ClientInitialize()
         {
-            _moveClientElement = new MoveClientElement(transform, _characterController, _animator);
-            _controllerElement = new InputLocalClientElement();
+            var moveClientElement = new MoveClientElement(transform, _animator);
+            var changeNameClientElement = new ChangeNameClientElement(_userNameText);
+            ClientInitializeElements(moveClientElement, changeNameClientElement);
             
-            ClientInitializeElements(_moveClientElement, _controllerElement);
-            
-            _controllerElement.MoveInputed.Subscribe(OnMoveInputedServerRpc).AddTo(Disposable);
-        }
-
-        [ObserversRpc]
-        private void OnMovedObserversRpc(bool isMoving, Vector3 position, Quaternion rotation)
-        {
-            _moveClientElement?.UpdateVisualMove(isMoving, position, rotation);
-        }
-
-        [ServerRpc]
-        private void OnMoveInputedServerRpc(Vector3 direction)
-        {
-            _moveServerElement?.SetMoveDirection(direction);
+            if (IsOwner)
+            {
+                var controllerElement = new InputLocalClientElement(LocalConnection);
+                ClientInitializeElements(controllerElement);
+            }
         }
     }
 }
