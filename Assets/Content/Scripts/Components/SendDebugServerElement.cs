@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.Components
 {
-    public class SendDebugServerElement : ServerNetworkElement
+    public class SendDebugServerComponent : ServerNetworkComponent
     {
     }
 }

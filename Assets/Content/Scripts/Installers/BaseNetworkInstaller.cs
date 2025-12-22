@@ -21,8 +21,6 @@ namespace Game.Installers
         {
             Stages.AddRange(stages);
         }
-        
-        protected virtual void ConfigureStages() {}
 
         protected void RunStages()
         {

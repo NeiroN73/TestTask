@@ -20,10 +20,12 @@ namespace Game.Installers
             _clientLifetimeScope.Build();
             NetworkObjectInitializeUtils.InitializeObjectsFromContainer(_clientLifetimeScope, IsController);
             NetworkObjectInitializeUtils.InitializeClientObjects(Behaviours, _clientLifetimeScope, IsController);
-            ConfigureStages();
+            ConfigureStages(conn);
             NetworkObjectInitializeUtils.InitializeClientObjects(Stages, _clientLifetimeScope, IsController);
             RunTick(_clientLifetimeScope, Time.deltaTime);
             RunStages();
         }
+
+        protected virtual void ConfigureStages(NetworkConnection networkConnection) {}
     }
 }

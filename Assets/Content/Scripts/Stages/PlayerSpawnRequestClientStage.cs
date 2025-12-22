@@ -9,19 +9,20 @@ namespace Game.Stages
 {
     public class PlayerSpawnRequestClientStage : NetworkInstallerStage, IClientInjectable
     {
-        private readonly NetworkConnection _networkConnection;
-        
         [Inject] private NetworkBehavioursClientFactory _networkBehavioursClientFactory;
+        
+        private NetworkConnection _networkConnection;
 
-        public PlayerSpawnRequestClientStage(NetworkConnection networkConnection)
+        public void Initialize(NetworkConnection networkConnection)
         {
             _networkConnection = networkConnection;
         }
         
         public override async UniTask Run()
         {
-            var player = await _networkBehavioursClientFactory.RequestCreateAsync<PlayerBehaviour>("bob",
-                _networkConnection, rotation: Quaternion.identity);
+            _networkBehavioursClientFactory.RequestCreateAsync("bob", _networkConnection, rotation: Quaternion.identity);
+
+            await UniTask.CompletedTask;
         }
     }
 }

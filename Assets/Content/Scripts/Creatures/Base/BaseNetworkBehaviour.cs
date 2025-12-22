@@ -1,29 +1,17 @@
-using System.Collections.Generic;
-using Content.Scripts.EventBus;
+using FishNet.Connection;
 using FishNet.Object;
-using FishNet.Object.Synchronizing;
-using Game.Components;
 using Game.Installers;
 using Game.LifetimeScopes;
-using R3;
+using GameCore.LifetimeScopes;
 using VContainer.Unity;
 
 namespace Game.Creatures
 {
     public abstract class BaseNetworkBehaviour : NetworkBehaviour
     {
-        private ServerLifetimeScope _serverLifetimeScope;
-        private ClientLifetimeScope _clientLifetimeScope;
+        private BaseLifetimeScope _lifetimeScope;
         
-        private List<NetworkElement> _elements = new();
-        
-        private readonly bool _isServerInitialized;
-        private readonly bool _isClientInitialized;
-        
-        protected CompositeDisposable Disposable = new();
-        
-        protected ServerEventBus ServerBehaviourEventBus;
-        protected ClientEventBus ClientBehaviourEventBus;
+        protected ComponentsContainer ComponentsContainer;
 
         public void TryInitialize()
         {
@@ -33,53 +21,32 @@ namespace Game.Creatures
         
         public void TryServerInitialize()
         {
-            _serverLifetimeScope = LifetimeScope.Find<ServerLifetimeScope>() as ServerLifetimeScope;
-            ServerBehaviourEventBus = new();
-            ServerInitialize();
+            _lifetimeScope = LifetimeScope.Find<ServerLifetimeScope>() as ServerLifetimeScope;
+            ComponentsContainer = new(gameObject);
+            Initialize();
         }
         
         [ObserversRpc]
         public void TryClientInitialize()
         {
-            _clientLifetimeScope = LifetimeScope.Find<ClientLifetimeScope>() as ClientLifetimeScope;
-            ClientBehaviourEventBus = new();
-            ClientInitialize();
+            _lifetimeScope = LifetimeScope.Find<ClientLifetimeScope>() as ClientLifetimeScope;
+            ComponentsContainer = new(gameObject);
+            Initialize();
         }
-
-        protected virtual void ServerInitialize()
+        
+        protected virtual void Initialize()
         {
         }
         
-        protected virtual void ClientInitialize()
+        protected void InitializeComponents()
         {
-        }
-        
-        protected void ServerInitializeElements(params ServerNetworkElement[] elements)
-        {
-            _elements.AddRange(elements);
-            
-            foreach (var element in elements)
+            var components = ComponentsContainer.Components;
+            foreach (var component in components)
             {
-                element.Initialize(ServerBehaviourEventBus);
-                element.InvokeSubscribes();
-                element.InvokePublishes();
+                component.Configure(ComponentsContainer);
             }
             
-            NetworkObjectInitializeUtils.InitializeServerObjects(_elements, _serverLifetimeScope);
-        }
-        
-        protected void ClientInitializeElements(params ClientNetworkElement[] elements)
-        {
-            _elements.AddRange(elements);
-            
-            foreach (var element in elements)
-            {
-                element.Initialize(ClientBehaviourEventBus);
-                element.InvokeSubscribes();
-                element.InvokePublishes();
-            }
-            
-            NetworkObjectInitializeUtils.InitializeClientObjects(_elements, _clientLifetimeScope, IsController);
+            NetworkObjectInitializeUtils.InitializeNetworkObjects(components, IsOwner, _lifetimeScope);
         }
     }
 }

@@ -1,30 +1,37 @@
-using Content.Scripts.EventBus;
+using System;
 using FishNet.Connection;
+using FishNet.Object;
 using Game.Configs;
 using Game.Creatures;
-using Game.Events;
+using R3;
 using UnityEngine;
+using VContainer;
 
 namespace Game.Components
 {
-    public class MoveServerElement : ServerNetworkElement, IServerTickable
+    public class MoveServerComponent : ServerNetworkComponent, IServerInjectable, IServerPreInitializable, IServerTickable
     {
         private NetworkConnection _networkConnection;
-        private readonly Transform _transform;
-        private readonly CharacterController _characterController;
-        private readonly MoveData _moveData;
+        private CharacterController _characterController;
         private Vector3 _moveDirection;
         
-        public MoveServerElement(Transform transform, CharacterController characterController, MoveData moveData)
-        {
-            _transform = transform;
-            _characterController = characterController;
-            _moveData = moveData;
-        }
+        private InputLocalClientComponent _inputLocalClientComponent;
+        
+        [Inject] private PlayerConfig _playerConfig;
 
-        public override void InvokeSubscribes()
+        public Observer<Vector3, Quaternion, bool> OnMoved = new();
+        
+        public void Configure(CharacterController characterController)
         {
-            BehaviourEventBus.ServerSubscribe<MoveInputedEvent>(OnSettedMoveDirection).AddDisposable(Disposable);
+            _characterController = characterController;
+        }
+        
+        public void PreInitialize()
+        {
+            if (ComponentsContainer.TryGetNetworkComponent<ControllerComponent>(out var component))
+            {
+                component.MoveInputed.Subscribe(OnSettedMoveDirection).AddTo(Disposable);
+            }
         }
 
         public void Tick(float deltaTime)
@@ -40,31 +47,38 @@ namespace Game.Components
                         Vector3.up
                     );
         
-                    _transform.rotation = Quaternion.Slerp(
-                        _transform.rotation,
+                    transform.rotation = Quaternion.Slerp(
+                        transform.rotation,
                         targetRotation,
-                        _moveData.RotateSpeed * deltaTime
+                        _playerConfig.MoveData.RotateSpeed * deltaTime
                     );
                 }
             }
     
-            Vector3 velocity = _moveDirection * _moveData.MoveSpeed;
-            _characterController.Move(velocity * deltaTime);
+            Vector3 velocity = _moveDirection * _playerConfig.MoveData.MoveSpeed;
+            _characterController?.Move(velocity * deltaTime);
     
             var isMoving = _moveDirection.magnitude > 0.1f;
+            MoveOnClients(transform.position, transform.rotation, isMoving);
+        }
+
+        private void OnSettedMoveDirection(Vector3 direction)
+        {
+            _moveDirection = direction;
+        }
+
+        [ObserversRpc]
+        private void MoveOnClients(Vector3 position, Quaternion rotation, bool isMoving)
+        {
+            OnMoved.Publish(position, rotation, isMoving);
             
-            BehaviourEventBus.PublishTargetRpc(_networkConnection, new MovedOnServerEvent
-            {
-                IsMoved = isMoving,
-                Position = _transform.position,
-                Rotation = _transform.rotation
-            });
+            Debug.Log("Server tick " + position);
         }
         
-        public void OnSettedMoveDirection(MoveInputedEvent e)
+        private void OnDrawGizmos()
         {
-            _networkConnection = e.NetworkConnection;
-            _moveDirection = e.Direction;
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, 0.5f);
         }
     }
 }

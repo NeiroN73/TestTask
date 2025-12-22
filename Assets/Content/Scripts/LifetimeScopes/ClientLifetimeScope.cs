@@ -6,11 +6,13 @@ namespace Game.LifetimeScopes
 {
     public class ClientLifetimeScope : BaseLifetimeScope
     {
+        public NetworkBehavioursClientFactory  NetworkBehavioursClientFactory;
+        
         protected override void RegisterSystems()
         {
             Register<ClientEventBus>();
             
-            Register<NetworkBehavioursClientFactory>();
+            Register(NetworkBehavioursClientFactory);
         }
     }
 }

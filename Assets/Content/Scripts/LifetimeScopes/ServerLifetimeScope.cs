@@ -8,9 +8,6 @@ namespace Game.LifetimeScopes
     {
         protected override void RegisterSystems()
         {
-            Register<ServerEventBus>();
-            
-            Register<NetworkBehavioursServerFactory>();
         }
     }
 }

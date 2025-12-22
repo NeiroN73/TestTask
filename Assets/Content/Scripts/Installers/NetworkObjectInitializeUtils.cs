@@ -25,9 +25,17 @@ namespace Game.Installers
                 {
                     scope.Container.Inject(serverInjectable);
                 }
+                if (obj is IServerPreInitializable serverPreInitialize)
+                {
+                    serverPreInitialize.PreInitialize();
+                }
                 if (obj is IServerInitializable serverInitializable)
                 {
                     serverInitializable.Initialize();
+                }
+                if (obj is IServerPostInitializable serverPostInitialize)
+                {
+                    serverPostInitialize.PostInitialize();
                 }
                 if (obj is IServerTickable serverTickable)
                 {
@@ -51,9 +59,17 @@ namespace Game.Installers
                 {
                     scope.Container.Inject(clientsInjectable);
                 }
+                if (obj is IClientPreInitializable clientPreInitialize)
+                {
+                    clientPreInitialize.PreInitialize();
+                }
                 if (obj is IClientInitializable clientsInitializable)
                 {
                     clientsInitializable.Initialize();
+                }
+                if (obj is IClientPostInitializable clientPostInitialize)
+                {
+                    clientPostInitialize.PostInitialize();
                 }
                 if (obj is IClientTickable clientsTickable)
                 {
@@ -66,9 +82,17 @@ namespace Game.Installers
 
                 if (isController)
                 {
+                    if (obj is ILocalClientPreInitializable localClientPreInitialize)
+                    {
+                        localClientPreInitialize.PreInitialize();
+                    }
                     if (obj is ILocalClientInitializable localClientInitializable)
                     {
                         localClientInitializable.Initialize();
+                    }
+                    if (obj is ILocalClientPostInitializable localClientPostInitialize)
+                    {
+                        localClientPostInitialize.PostInitialize();
                     }
                     if (obj is ILocalClientTickable localClientTickable)
                     {
@@ -81,9 +105,17 @@ namespace Game.Installers
                 }
                 else
                 {
+                    if (obj is IOtherClientsPreInitializable otherClientsPreInitialize)
+                    {
+                        otherClientsPreInitialize.PreInitialize();
+                    }
                     if (obj is IOtherClientsInitializable otherClientsInitializable)
                     {
                         otherClientsInitializable.Initialize();
+                    }
+                    if (obj is IOtherClientsPostInitializable otherClientsPostInitialize)
+                    {
+                        otherClientsPostInitialize.PostInitialize();
                     }
                     if (obj is IOtherClientsTickable otherClientsTickable)
                     {
@@ -98,10 +130,16 @@ namespace Game.Installers
         }
         
         public static void InitializeNetworkObjects<TObject>(IReadOnlyCollection<TObject> objects, bool isController,
-            ServerLifetimeScope serverScope, ClientLifetimeScope clientScope)
+            BaseLifetimeScope scope)
         {
-            InitializeServerObjects(objects, serverScope);
-            InitializeClientObjects(objects, clientScope, isController);
+            if (scope is ServerLifetimeScope serverLifetimeScope)
+            {
+                InitializeServerObjects(objects, serverLifetimeScope);
+            }
+            if (scope is ClientLifetimeScope clientLifetimeScope)
+            {
+                InitializeClientObjects(objects, clientLifetimeScope, isController);
+            }
         }
 
         public static void InitializeObjectsFromContainer<T>(T scope, bool isController = false) where T : BaseLifetimeScope
@@ -109,7 +147,9 @@ namespace Game.Installers
             var objects = new List<object>();
             
             objects.AddRange(scope.Container.Resolve<IEnumerable<IInjectable>>());
+            objects.AddRange(scope.Container.Resolve<IEnumerable<IPreInitializable>>());
             objects.AddRange(scope.Container.Resolve<IEnumerable<IInitializable>>());
+            objects.AddRange(scope.Container.Resolve<IEnumerable<IPostInitializable>>());
             objects.AddRange(scope.Container.Resolve<IEnumerable<ITickable>>());
             objects.AddRange(scope.Container.Resolve<IEnumerable<IDisposable>>());
 

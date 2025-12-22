@@ -11,9 +11,9 @@ namespace Game.Components
     {
         [Inject] private CreaturesFactory creaturesFactory;
 
-        public void Init(ControllerElement controllerElement)
+        public void Init(ControllerComponent controllerComponent)
         {
-            controllerElement.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
+            controllerComponent.SpawnPerformed.Subscribe(CmdSpawnCube).AddTo(Disposable);
         }
 
         [ServerRpc]

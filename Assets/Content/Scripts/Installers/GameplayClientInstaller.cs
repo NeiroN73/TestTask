@@ -1,16 +1,16 @@
+using FishNet.Connection;
 using Game.Stages;
 
 namespace Game.Installers
 {
     public class GameplayClientInstaller : ClientInstaller
     {
-        private PlayerSpawnRequestClientStage playerSpawnRequestClientStage;
-
-        protected override void ConfigureStages()
+        protected override void ConfigureStages(NetworkConnection networkConnection)
         {
-            playerSpawnRequestClientStage = new PlayerSpawnRequestClientStage(LocalConnection);
+            var stage = FindAnyObjectByType<PlayerSpawnRequestClientStage>();
+            stage.Initialize(networkConnection);
             
-            AddStages(playerSpawnRequestClientStage);
+            AddStages(stage);
         }
     }
 }

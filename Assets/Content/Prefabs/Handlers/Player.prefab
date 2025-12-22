@@ -12,8 +12,13 @@ GameObject:
   - component: {fileID: 3188103354407930909}
   - component: {fileID: 8948568845466506890}
   - component: {fileID: 4006887360925407049}
-  - component: {fileID: 3704313638912128147}
+  - component: {fileID: -2717289479647620111}
   - component: {fileID: 4500372667744781470}
+  - component: {fileID: 7669376208396139951}
+  - component: {fileID: 4307307150797142673}
+  - component: {fileID: 6499468614599040733}
+  - component: {fileID: -4499463929323958475}
+  - component: {fileID: 3471187114954392293}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -104,7 +109,15 @@ MonoBehaviour:
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  NetworkBehaviours:
+  - {fileID: -2717289479647620111}
+  - {fileID: 4500372667744781470}
+  - {fileID: 7669376208396139951}
+  - {fileID: 4307307150797142673}
+  - {fileID: 6499468614599040733}
+  - {fileID: -4499463929323958475}
+  - {fileID: 3471187114954392293}
+  - {fileID: 4223577609107877168}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -115,38 +128,38 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: 0
+  _initializedTimestamp: -8584351759123749397
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
   _predictionType: 0
-  _graphicalObject: {fileID: 0}
-  _detachGraphicalObject: 0
+  _graphicalObject: {fileID: 5871703538271745622}
+  _detachGraphicalObject: 1
   _enableStateForwarding: 1
   _networkTransform: {fileID: 0}
-  _ownerInterpolation: 1
+  _ownerInterpolation: 240
   _ownerSmoothedProperties: 255
-  _adaptiveInterpolation: 3
+  _adaptiveInterpolation: 6
   _spectatorSmoothedProperties: 255
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 12414571792371327587
   SceneId: 0
   SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
---- !u!114 &3704313638912128147
+    Position: {x: -0.24725762, y: -2.4784203, z: 0.75024116}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1
+--- !u!114 &-2717289479647620111
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 952076547882031899}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
@@ -197,12 +210,87 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fea808803d6afe46b40930db87d17c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Creatures.PlayerBehaviour
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 4006887360925407049}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 4006887360925407049}
   _animator: {fileID: 5202413193679753000}
   _characterController: {fileID: 8948568845466506890}
   _userNameText: {fileID: 7131392454668018468}
+--- !u!114 &7669376208396139951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 005150a7f6684be383cba012df2888df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.InputLocalClientComponent
+  _componentIndexCache: 2
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 4006887360925407049}
+--- !u!114 &4307307150797142673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e39a476d21f4ee6a82d07861a3eae42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.MoveServerComponent
+  _componentIndexCache: 3
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 4006887360925407049}
+--- !u!114 &6499468614599040733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a7fdb8d1f7416893c24d9fb6385531, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.ChangeNameClientComponent
+  _componentIndexCache: 4
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 4006887360925407049}
+--- !u!114 &-4499463929323958475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6edbcdc1615b4c868eed2d7d90a3b48d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.ChangeNameServerComponent
+  _componentIndexCache: 5
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 4006887360925407049}
+--- !u!114 &3471187114954392293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50648d6388764a8daa5215e2b3c404e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.MoveClientComponent
+  _componentIndexCache: 6
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 4006887360925407049}
 --- !u!1 &1233020742779370945
 GameObject:
   m_ObjectHideFlags: 0
@@ -624,9 +712,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 255
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 4006887360925407049}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 4006887360925407049}
   IgnoredParameters: []
   _animator: {fileID: 5202413193679753000}
   _synchronizeWhenDisabled: 0

@@ -1,20 +1,14 @@
 using FishNet.Connection;
+using FishNet.Object;
 using Game.Creatures;
-using Game.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Game.Components
 {
-    public class InputLocalClientElement : ControllerElement, ILocalClientInitializable
+    public class InputLocalClientComponent : ControllerComponent, ILocalClientInitializable
     {
-        private readonly NetworkConnection _networkConnection;
         private PlayerInputActions _playerInputActions;
-
-        public InputLocalClientElement(NetworkConnection networkConnection)
-        {
-            _networkConnection = networkConnection;
-        }
         
         public void Initialize()
         {
@@ -31,13 +25,16 @@ namespace Game.Components
         {
             var value = obj.ReadValue<Vector2>();
             var moveDirection = new Vector3(value.x, 0, value.y);
-            BehaviourEventBus.PublishServerRpc(new MoveInputedEvent
-            {
-                NetworkConnection = _networkConnection,
-                Direction = moveDirection
-            });
+            
+            MoveTarget(LocalConnection, moveDirection);
         }
 
+        [ServerRpc]
+        private void MoveTarget(NetworkConnection conn, Vector3 direction)
+        {
+            MoveInputed.Publish(direction);
+        }
+        
         private void SpawnOnPerformed(InputAction.CallbackContext obj)
         {
             SpawnPerformed.Publish();
