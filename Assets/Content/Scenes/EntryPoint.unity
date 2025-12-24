@@ -574,6 +574,7 @@ MonoBehaviour:
   autoRun: 0
   autoInjectGameObjects:
   - {fileID: 572965947}
+  _configs: []
 --- !u!1 &1166938099
 GameObject:
   m_ObjectHideFlags: 0
@@ -624,6 +625,7 @@ MonoBehaviour:
   autoInjectGameObjects:
   - {fileID: 308545287}
   - {fileID: 1217102844}
+  _configs: []
   _coreConfigsAssetLabel:
     m_LabelString: coreConfigs
   _gameConfigsAssetLabel:

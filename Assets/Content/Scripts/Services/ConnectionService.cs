@@ -15,7 +15,7 @@ namespace Game.Services
         [Inject] private ScenesService _scenesService;
 
         private NetworkManager _networkManager;
-        
+
         private NetworkManager NetworkManager
         {
             get
@@ -31,21 +31,21 @@ namespace Game.Services
             try
             {
                 _screensService.OpenLoading<LoadingScreen>();
-                
+
                 await StopActiveNetworkConnection();
                 await _scenesService.LoadSceneAsync(SceneConsts.Gameplay);
-                
+
                 NetworkManager.ServerManager.StartConnection();
                 NetworkManager.ClientManager.StartConnection();
-                
+
                 await WaitForNetworkCondition(() => NetworkManager.ServerManager.Started, TimeSpan.FromSeconds(20),
                     "Host activation");
-                
+
                 onSuccess?.Invoke();
             }
             catch (Exception ex)
             {
-                HandleNetworkError(() => 
+                HandleNetworkError(() =>
                 {
                     NetworkManager.ServerManager.StopConnection(true);
                     NetworkManager.ClientManager.StopConnection();
@@ -63,15 +63,15 @@ namespace Game.Services
             try
             {
                 _screensService.OpenLoading<LoadingScreen>();
-                
+
                 await StopActiveNetworkConnection();
                 await _scenesService.LoadSceneAsync(SceneConsts.Gameplay);
-                
+
                 NetworkManager.ClientManager.StartConnection(address, port);
-                
-                await WaitForNetworkCondition(() => NetworkManager.ClientManager.Started, TimeSpan.FromSeconds(20), 
+
+                await WaitForNetworkCondition(() => NetworkManager.ClientManager.Started, TimeSpan.FromSeconds(20),
                     "Client connection");
-                
+
                 onSuccess?.Invoke();
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace Game.Services
         {
             string address = NetworkManager.TransportManager.Transport.GetClientAddress();
             ushort port = NetworkManager.TransportManager.Transport.GetPort();
-            
+
             await JoinGameAsync(address, port, onSuccess);
         }
 
@@ -105,7 +105,7 @@ namespace Game.Services
             {
                 NetworkManager.ServerManager.StopConnection(true);
                 NetworkManager.ClientManager.StopConnection();
-                
+
                 await UniTask.Delay(1000);
             }
         }
@@ -121,21 +121,21 @@ namespace Game.Services
                 throw new TimeoutException($"{operationName} timeout after {timeout.TotalSeconds} seconds");
             }
         }
-        
+
         public async UniTask StartServerAsync(Action onSuccess)
         {
             try
             {
                 _screensService.OpenLoading<LoadingScreen>();
-                
+
                 await StopActiveNetworkConnection();
                 await _scenesService.LoadSceneAsync(SceneConsts.Gameplay);
-                
+
                 NetworkManager.ServerManager.StartConnection();
-                
+
                 await WaitForNetworkCondition(() => NetworkManager.ServerManager.Started, TimeSpan.FromSeconds(20),
                     "Server activation");
-                
+
                 onSuccess?.Invoke();
             }
             catch (Exception ex)
@@ -148,16 +148,16 @@ namespace Game.Services
                 _screensService.CloseLoading();
             }
         }
-        
+
         public void Disconnect()
         {
             if (NetworkManager.ServerManager.Started)
                 NetworkManager.ServerManager.StopConnection(true);
-            
+
             if (NetworkManager.ClientManager.Started)
                 NetworkManager.ClientManager.StopConnection();
         }
-        
+
         public bool IsHosting => NetworkManager.ServerManager.Started && NetworkManager.ClientManager.Started;
         public bool IsServerOnly => NetworkManager.ServerManager.Started && !NetworkManager.ClientManager.Started;
         public bool IsClientOnly => !NetworkManager.ServerManager.Started && NetworkManager.ClientManager.Started;

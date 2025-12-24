@@ -1,4 +1,3 @@
-using System;
 using FishNet.Connection;
 using FishNet.Object;
 using Game.Configs;
@@ -9,24 +8,30 @@ using VContainer;
 
 namespace Game.Components
 {
-    public class MoveServerComponent : ServerNetworkComponent, IServerInjectable, IServerPreInitializable, IServerTickable
+    public class MoveComponent : ServerNetworkComponent,
+        IInjectable,
+        IClientPreInitializable,
+        IServerTickable,
+        IClientTickable
     {
+        private readonly int _running = Animator.StringToHash("isRunning");
+        
         private NetworkConnection _networkConnection;
         private CharacterController _characterController;
+        private Animator _animator;
         private Vector3 _moveDirection;
         
         private InputLocalClientComponent _inputLocalClientComponent;
         
         [Inject] private PlayerConfig _playerConfig;
 
-        public Observer<Vector3, Quaternion, bool> OnMoved = new();
-        
-        public void Configure(CharacterController characterController)
+        public void Configure(CharacterController characterController, Animator animator)
         {
             _characterController = characterController;
+            _animator = animator;
         }
         
-        public void PreInitialize()
+        public void ClientPreInitialize()
         {
             if (ComponentsContainer.TryGetNetworkComponent<ControllerComponent>(out var component))
             {
@@ -34,7 +39,25 @@ namespace Game.Components
             }
         }
 
-        public void Tick(float deltaTime)
+        public void ServerTick(float deltaTime)
+        {
+            Move(deltaTime);
+        }
+
+        private void OnSettedMoveDirection(Vector3 direction)
+        {
+            _moveDirection = direction;
+
+            OnServerSettedMoveDirection(direction);
+        }
+        
+        [ServerRpc]
+        private void OnServerSettedMoveDirection(Vector3 direction)
+        {
+            _moveDirection = direction;
+        }
+        
+        private void Move(float deltaTime)
         {
             if (_moveDirection.magnitude > 0.1f)
             {
@@ -59,26 +82,12 @@ namespace Game.Components
             _characterController?.Move(velocity * deltaTime);
     
             var isMoving = _moveDirection.magnitude > 0.1f;
-            MoveOnClients(transform.position, transform.rotation, isMoving);
+            _animator.SetBool(_running, isMoving);   
         }
 
-        private void OnSettedMoveDirection(Vector3 direction)
+        public void ClientTick(float deltaTime)
         {
-            _moveDirection = direction;
-        }
-
-        [ObserversRpc]
-        private void MoveOnClients(Vector3 position, Quaternion rotation, bool isMoving)
-        {
-            OnMoved.Publish(position, rotation, isMoving);
-            
-            Debug.Log("Server tick " + position);
-        }
-        
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, 0.5f);
+            Move(deltaTime);
         }
     }
 }

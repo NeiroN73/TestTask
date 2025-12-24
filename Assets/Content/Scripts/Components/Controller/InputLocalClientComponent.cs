@@ -10,7 +10,7 @@ namespace Game.Components
     {
         private PlayerInputActions _playerInputActions;
         
-        public void Initialize()
+        public void LocalClientInitialize()
         {
             _playerInputActions = new();
             _playerInputActions.Enable();
@@ -26,11 +26,10 @@ namespace Game.Components
             var value = obj.ReadValue<Vector2>();
             var moveDirection = new Vector3(value.x, 0, value.y);
             
-            MoveTarget(LocalConnection, moveDirection);
+            MoveTarget(moveDirection);
         }
 
-        [ServerRpc]
-        private void MoveTarget(NetworkConnection conn, Vector3 direction)
+        private void MoveTarget(Vector3 direction)
         {
             MoveInputed.Publish(direction);
         }

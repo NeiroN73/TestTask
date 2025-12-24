@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using FishNet.Object;
 using Game.Components;
 using UnityEngine;
 
@@ -42,6 +40,12 @@ namespace Game.Creatures
                     return outComponent;
                 }
             }
+#if UNITY_EDITOR
+            else
+            {
+                return _gameObject.AddComponent<T>();
+            }
+#endif
             
             return null;
         }
@@ -54,8 +58,14 @@ namespace Game.Creatures
             {
                 return TryAddNetworkComponent<TBaseComponent>() as TComponent;
             }
-            
+#if UNITY_EDITOR
+            else
+            {
+                return _gameObject.AddComponent<TComponent>();
+            }
+#else
             return null;
+#endif
         }
     }
 }

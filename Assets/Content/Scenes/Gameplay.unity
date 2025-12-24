@@ -322,8 +322,8 @@ GameObject:
   m_Component:
   - component: {fileID: 585846001}
   - component: {fileID: 585846000}
-  - component: {fileID: 585845999}
   - component: {fileID: 585845998}
+  - component: {fileID: 585846002}
   m_Layer: 0
   m_Name: Services
   m_TagString: Untagged
@@ -343,21 +343,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64fe6d73335743e29e10a3a3733f9d58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Content.Scripts.Factories.NetworkBehavioursServerFactory
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 585846000}
-  _networkObjectCache: {fileID: 0}
---- !u!114 &585845999
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 585845997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7629e5e308e747b19f7d200e785bbc1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Content.Scripts.Factories.NetworkBehavioursClientFactory
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 585846000}
   _networkObjectCache: {fileID: 0}
@@ -429,6 +414,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &585846002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585845997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb7e9d2f4fa64431bb235611a00392af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Services.NetworkTickService
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 585846000}
+  _networkObjectCache: {fileID: 0}
 --- !u!1 &888840578
 GameObject:
   m_ObjectHideFlags: 0
@@ -536,8 +536,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1327898213}
   - component: {fileID: 1327898214}
-  - component: {fileID: 1327898216}
-  - component: {fileID: 1327898215}
   m_Layer: 0
   m_Name: LifetimeScopes
   m_TagString: Untagged
@@ -574,44 +572,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parentReference:
     TypeName: Game.LifetimeScopes.AppLifetimeScope
-  autoRun: 1
+  autoRun: 0
   autoInjectGameObjects:
   - {fileID: 2009856746}
   - {fileID: 585845997}
---- !u!114 &1327898215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1327898211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e384c6ab8154bedb5545e9d3136e17a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.LifetimeScopes.ClientLifetimeScope
-  parentReference:
-    TypeName: Game.LifetimeScopes.GameplayLifetimeScope
-  autoRun: 1
-  autoInjectGameObjects:
   - {fileID: 380858870}
-  NetworkBehavioursClientFactory: {fileID: 585845999}
---- !u!114 &1327898216
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1327898211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c84dd0d3120a47349e87c32f4f3e3829, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.LifetimeScopes.ServerLifetimeScope
-  parentReference:
-    TypeName: Game.LifetimeScopes.GameplayLifetimeScope
-  autoRun: 1
-  autoInjectGameObjects: []
+  _configs:
+  - {fileID: 11400000, guid: 9e90280cb197a0d48bc0c318b041b523, type: 2}
 --- !u!1 &1532566326
 GameObject:
   m_ObjectHideFlags: 0
@@ -766,9 +733,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2009856748}
-  - component: {fileID: 2009856747}
-  - component: {fileID: 2009856751}
   - component: {fileID: 2009856750}
+  - component: {fileID: 2009856751}
   m_Layer: 0
   m_Name: GameplayInstaller
   m_TagString: Untagged
@@ -776,22 +742,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2009856747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2009856746}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 620c467024324587b99f7d73b1e5f9cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 2009856750}
-  _networkObjectCache: {fileID: 0}
-  _clientLifetimeScope: {fileID: 1327898215}
 --- !u!4 &2009856748
 Transform:
   m_ObjectHideFlags: 0
@@ -869,13 +819,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 2009856746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bb22fbadbfb47e3ad33affb5b8b15c8, type: 3}
+  m_Script: {fileID: 11500000, guid: f30be78c28ee460abd27680981723a9a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Installers.GameplayServerInstaller
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Installers.BaseNetworkInstaller
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 2009856750}
   _networkObjectCache: {fileID: 0}
-  _serverLifetimeScope: {fileID: 1327898216}
+  _gameplayLifetimeScope: {fileID: 1327898214}
+  _stages:
+  - {fileID: 380858871}
+  _services:
+  - {fileID: 585845998}
+  - {fileID: 585846002}
+  _behaviours: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

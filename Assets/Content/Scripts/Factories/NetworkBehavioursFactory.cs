@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using Content.Scripts.EventBus;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
 using Game.Creatures;
-using Game.LifetimeScopes;
 using GameCore.Configs;
 using GameCore.Services;
 using UnityEngine;
 using VContainer;
-using Object = UnityEngine.Object;
 
 namespace Content.Scripts.Factories
 {
-    public class NetworkBehavioursServerFactory : NetworkFactory, IServerInjectable, IServerInitializable
+    public class NetworkBehavioursFactory : NetworkService, IServerInitializable, IInjectable
     {
         [Inject] private BehavioursConfig _behavioursConfig;
         [Inject] private AssetsLoaderService _assetsLoaderService;
+        [Inject] private IObjectResolver _objectResolver;
 
         private Dictionary<string, BaseNetworkBehaviour> _behavioursById;
 
-        public void Initialize()
+        public void ServerInitialize()
         {
             _behavioursById = new();
         
@@ -44,9 +42,9 @@ namespace Content.Scripts.Factories
             if (prefab == null)
                 throw new InvalidOperationException($"Creature with ID '{id}' not found in config");
 
-            var creature = Instantiate(prefab, position, rotation, parent);
-            InstanceFinder.ServerManager.Spawn(creature.gameObject, networkConnection);
-            InitializeBehaviour(creature);
+            var behaviour = Instantiate(prefab, position, rotation, parent);
+            InstanceFinder.ServerManager.Spawn(behaviour.gameObject, networkConnection);
+            InitializeBehaviour(behaviour);
         }
         
         private BaseNetworkBehaviour GetCreatureById(string id)
@@ -60,10 +58,19 @@ namespace Content.Scripts.Factories
             return null;
         }
         
-        public void InitializeBehaviour<TBehaviour>(TBehaviour behaviour)
-            where TBehaviour : BaseNetworkBehaviour
+        public void InitializeBehaviour(BaseNetworkBehaviour behaviour)
         {
-            behaviour.TryInitialize();
+            _objectResolver.Inject(behaviour);
+            behaviour.Initialize(_objectResolver);
+
+            ClientsInitializeBehaviourRpc(behaviour);
+        }
+
+        [ObserversRpc]
+        private void ClientsInitializeBehaviourRpc(BaseNetworkBehaviour behaviour)
+        {
+            _objectResolver.Inject(behaviour);
+            behaviour.Initialize(_objectResolver);
         }
     }
 }

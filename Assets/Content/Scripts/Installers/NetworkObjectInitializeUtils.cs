@@ -1,165 +1,177 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FishNet.Object;
 using Game.Creatures;
-using Game.LifetimeScopes;
-using GameCore.Creatures;
-using GameCore.LifetimeScopes;
-using GameCore.Services;
+using Game.Services;
 using VContainer;
-using IInitializable = GameCore.Services.IInitializable;
-using ITickable = GameCore.Services.ITickable;
 
 namespace Game.Installers
 {
     public static class NetworkObjectInitializeUtils
     {
-        public static void InitializeServerObjects<TObject>(IEnumerable<TObject> objects,
-            ServerLifetimeScope scope)
+        public static void InitializeNetworkObjects<TObject>(IEnumerable<TObject> objects, IObjectResolver objectResolver)
+            where TObject : NetworkBehaviour
         {
-            var tickService = scope.Container.Resolve<TickService>();
-            
+            var tickService = objectResolver.Resolve<NetworkTickService>();
+
             foreach (var obj in objects)
             {
-                if (obj is IServerInjectable serverInjectable)
+                var networkObject = obj.GetComponent<NetworkObject>();
+                
+                if (obj is IInjectable serverInjectable)
                 {
-                    scope.Container.Inject(serverInjectable);
+                    objectResolver.Inject(serverInjectable);
                 }
-                if (obj is IServerPreInitializable serverPreInitialize)
+                
+                if (networkObject.IsServerInitialized)
                 {
-                    serverPreInitialize.PreInitialize();
-                }
-                if (obj is IServerInitializable serverInitializable)
-                {
-                    serverInitializable.Initialize();
-                }
-                if (obj is IServerPostInitializable serverPostInitialize)
-                {
-                    serverPostInitialize.PostInitialize();
-                }
-                if (obj is IServerTickable serverTickable)
-                {
-                    tickService.RegisterTick(serverTickable);
-                }
-                if (obj is IServerDisposable serverDisposable)
-                {
-                    serverDisposable.Dispose();
-                }
-            }
-        }
-        
-        public static void InitializeClientObjects<TObject>(IEnumerable<TObject> objects,
-            ClientLifetimeScope scope, bool isController)
-        {
-            var tickService = scope.Container.Resolve<TickService>();
-            
-            foreach (var obj in objects)
-            {
-                if (obj is IClientInjectable clientsInjectable)
-                {
-                    scope.Container.Inject(clientsInjectable);
-                }
-                if (obj is IClientPreInitializable clientPreInitialize)
-                {
-                    clientPreInitialize.PreInitialize();
-                }
-                if (obj is IClientInitializable clientsInitializable)
-                {
-                    clientsInitializable.Initialize();
-                }
-                if (obj is IClientPostInitializable clientPostInitialize)
-                {
-                    clientPostInitialize.PostInitialize();
-                }
-                if (obj is IClientTickable clientsTickable)
-                {
-                    tickService.RegisterTick(clientsTickable);
-                }
-                if (obj is IClientDisposable clientsDisposable)
-                {
-                    clientsDisposable.Dispose();
+                    if (obj is IServerPreInitializable serverPreInitialize)
+                    {
+                        serverPreInitialize.ServerPreInitialize();
+                    }
+
+                    if (obj is IServerInitializable serverInitializable)
+                    {
+                        serverInitializable.ServerInitialize();
+                    }
+
+                    if (obj is IServerPostInitializable serverPostInitialize)
+                    {
+                        serverPostInitialize.ServerPostInitialize();
+                    }
+
+                    if (obj is IServerPreTickable serverPreTickable)
+                    {
+                        tickService.RegisterServerPreTick(serverPreTickable);
+                    }
+
+                    if (obj is IServerTickable serverTickable)
+                    {
+                        tickService.RegisterServerTick(serverTickable);
+                    }
+
+                    if (obj is IServerPostTickable serverPostTickable)
+                    {
+                        tickService.RegisterServerPostTick(serverPostTickable);
+                    }
+
+                    if (obj is IServerDisposable serverDisposable)
+                    {
+                        serverDisposable.ServerDispose();
+                    }
                 }
 
-                if (isController)
+                if (networkObject.IsClientInitialized)
                 {
-                    if (obj is ILocalClientPreInitializable localClientPreInitialize)
+                    if (obj is IClientPreInitializable clientPreInitialize)
                     {
-                        localClientPreInitialize.PreInitialize();
+                        clientPreInitialize.ClientPreInitialize();
                     }
-                    if (obj is ILocalClientInitializable localClientInitializable)
+
+                    if (obj is IClientInitializable clientInitializable)
                     {
-                        localClientInitializable.Initialize();
+                        clientInitializable.ClientInitialize();
                     }
-                    if (obj is ILocalClientPostInitializable localClientPostInitialize)
+
+                    if (obj is IClientPostInitializable clientPostInitialize)
                     {
-                        localClientPostInitialize.PostInitialize();
+                        clientPostInitialize.ClientPostInitialize();
                     }
-                    if (obj is ILocalClientTickable localClientTickable)
+
+                    if (obj is IClientPreTickable clientPreTickable)
                     {
-                        tickService.RegisterTick(localClientTickable);
+                        tickService.RegisterClientPreTick(clientPreTickable);
                     }
-                    if (obj is ILocalClientDisposable localClientDisposable)
+
+                    if (obj is IClientTickable clientTickable)
                     {
-                        localClientDisposable.Dispose();
+                        tickService.RegisterClientTick(clientTickable);
+                    }
+
+                    if (obj is IClientPostTickable clientPostTickable)
+                    {
+                        tickService.RegisterClientPostTick(clientPostTickable);
+                    }
+
+                    if (obj is IClientDisposable clientDisposable)
+                    {
+                        clientDisposable.ClientDispose();
+                    }
+
+                    if (networkObject.IsOwner)
+                    {
+                        if (obj is ILocalClientPreInitializable localClientPreInitialize)
+                        {
+                            localClientPreInitialize.LocalClientPreInitialize();
+                        }
+
+                        if (obj is ILocalClientInitializable localClientInitializable)
+                        {
+                            localClientInitializable.LocalClientInitialize();
+                        }
+
+                        if (obj is ILocalClientPostInitializable localClientPostInitialize)
+                        {
+                            localClientPostInitialize.LocalClientPostInitialize();
+                        }
+
+                        if (obj is ILocalClientPreTickable localClientPreTickable)
+                        {
+                            tickService.RegisterLocalClientPreTick(localClientPreTickable);
+                        }
+
+                        if (obj is ILocalClientTickable localClientTickable)
+                        {
+                            tickService.RegisterLocalClientTick(localClientTickable);
+                        }
+
+                        if (obj is ILocalClientPostTickable localClientPostTickable)
+                        {
+                            tickService.RegisterLocalClientPostTick(localClientPostTickable);
+                        }
+
+                        if (obj is ILocalClientDisposable localClientDisposable)
+                        {
+                            localClientDisposable.LocalClientDispose();
+                        }
+                    }
+                    else
+                    {
+                        if (obj is IOtherClientsPreInitializable otherClientsPreInitialize)
+                        {
+                            otherClientsPreInitialize.OtherClientsPreInitialize();
+                        }
+
+                        if (obj is IOtherClientsInitializable otherClientsInitializable)
+                        {
+                            otherClientsInitializable.OtherClientsInitialize();
+                        }
+
+                        if (obj is IOtherClientsPostInitializable otherClientsPostInitialize)
+                        {
+                            otherClientsPostInitialize.OtherClientsPostInitialize();
+                        }
+
+                        if (obj is IOtherClientsPreTickable otherClientsPreTickable)
+                        {
+                            tickService.RegisterOtherClientsPreTick(otherClientsPreTickable);
+                        }
+
+                        if (obj is IOtherClientsTickable otherClientsTickable)
+                        {
+                            tickService.RegisterOtherClientsTick(otherClientsTickable);
+                        }
+
+                        if (obj is IOtherClientsPostTickable otherClientsPostTickable)
+                        {
+                            tickService.RegisterOtherClientsPostTick(otherClientsPostTickable);
+                        }
+
+                        if (obj is IOtherClientsDisposable otherClientsDisposable)
+                        {
+                            otherClientsDisposable.OtherClientsDispose();
+                        }
                     }
                 }
-                else
-                {
-                    if (obj is IOtherClientsPreInitializable otherClientsPreInitialize)
-                    {
-                        otherClientsPreInitialize.PreInitialize();
-                    }
-                    if (obj is IOtherClientsInitializable otherClientsInitializable)
-                    {
-                        otherClientsInitializable.Initialize();
-                    }
-                    if (obj is IOtherClientsPostInitializable otherClientsPostInitialize)
-                    {
-                        otherClientsPostInitialize.PostInitialize();
-                    }
-                    if (obj is IOtherClientsTickable otherClientsTickable)
-                    {
-                        tickService.RegisterTick(otherClientsTickable);
-                    }
-                    if (obj is IOtherClientsDisposable otherClientsDisposable)
-                    {
-                        otherClientsDisposable.Dispose();
-                    }
-                }
-            }
-        }
-        
-        public static void InitializeNetworkObjects<TObject>(IReadOnlyCollection<TObject> objects, bool isController,
-            BaseLifetimeScope scope)
-        {
-            if (scope is ServerLifetimeScope serverLifetimeScope)
-            {
-                InitializeServerObjects(objects, serverLifetimeScope);
-            }
-            if (scope is ClientLifetimeScope clientLifetimeScope)
-            {
-                InitializeClientObjects(objects, clientLifetimeScope, isController);
-            }
-        }
-
-        public static void InitializeObjectsFromContainer<T>(T scope, bool isController = false) where T : BaseLifetimeScope
-        {
-            var objects = new List<object>();
-            
-            objects.AddRange(scope.Container.Resolve<IEnumerable<IInjectable>>());
-            objects.AddRange(scope.Container.Resolve<IEnumerable<IPreInitializable>>());
-            objects.AddRange(scope.Container.Resolve<IEnumerable<IInitializable>>());
-            objects.AddRange(scope.Container.Resolve<IEnumerable<IPostInitializable>>());
-            objects.AddRange(scope.Container.Resolve<IEnumerable<ITickable>>());
-            objects.AddRange(scope.Container.Resolve<IEnumerable<IDisposable>>());
-
-            if (scope is ServerLifetimeScope serverLifetimeScope)
-            {
-                InitializeServerObjects(objects, serverLifetimeScope);
-            }
-            if (scope is ClientLifetimeScope clientLifetimeScope)
-            {
-                InitializeClientObjects(objects, clientLifetimeScope, isController);
             }
         }
     }

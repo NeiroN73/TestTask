@@ -11,16 +11,11 @@ namespace Game.Creatures
 
         [SerializeField] private TMP_Text _userNameText; //temp test
 
-        protected override void Initialize()
+        protected override void Configure(ComponentsContainer componentsContainer)
         {
-            ComponentsContainer.TryAddNetworkComponent<MoveServerComponent>().Configure(_characterController);
-            ComponentsContainer.TryAddNetworkComponent<ChangeNameServerComponent>();
-            
-            ComponentsContainer.TryAddNetworkComponent<InputLocalClientComponent, ControllerComponent>();
-            ComponentsContainer.TryAddNetworkComponent<MoveClientComponent>().Configure(_animator);
-            ComponentsContainer.TryAddNetworkComponent<ChangeNameClientComponent>().Configure(_userNameText);
-            
-            InitializeComponents();
+            componentsContainer.TryAddNetworkComponent<MoveComponent>().Configure(_characterController, _animator);
+            componentsContainer.TryAddNetworkComponent<InputLocalClientComponent, ControllerComponent>();
+            componentsContainer.TryAddNetworkComponent<ChangeNameComponent>().Configure(_userNameText);
         }
     }
 }
