@@ -7,21 +7,23 @@ using VContainer;
 
 namespace Game.Components
 {
-    public class ChangeNameComponent : ClientNetworkComponent, IInjectable, IClientInitializable,
+    public class ChangeNameComponent : NetworkComponent, IInjectable, IClientPreInitializable,
         ILocalClientInitializable, IClientDisposable
     {
-        private readonly SyncVar<string> _userName = new();
-        
-        [Inject] private PlayerState _playerState;
+        private readonly SyncVar<string> _userName = new(new SyncTypeSettings(ReadPermission.OwnerOnly));
         
         private TMP_Text _userNameText;
         
+        [Inject] private PlayerState _playerState;
+
+        public Observer<string> UsernameChanged = new();
+
         public void Configure(TMP_Text userNameText)
         {
             _userNameText = userNameText;
         }
-
-        public void ClientInitialize()
+        
+        public void ClientPreInitialize()
         {
             _userName.OnChange += OnUsernameChanged;
         }
@@ -30,10 +32,19 @@ namespace Game.Components
         {
             SetUsernameServerRpc(_playerState.Username);
         }
-
-        private void OnUsernameChanged(string oldValue, string newValue, bool asServer)
+        
+        private void OnUsernameChanged(string prevValue, string nextValue, bool asServer)
         {
-            _userNameText.text = newValue;
+            UpdateNameText(nextValue);
+        }
+
+        private void UpdateNameText(string name)
+        {
+            if (_userNameText)
+            {
+                _userNameText.text = name;
+                UsernameChanged.Publish(name);
+            }
         }
 
         [ServerRpc]
@@ -44,7 +55,7 @@ namespace Game.Components
 
         public void ClientDispose()
         {
-            //_userName.OnChange -= OnUsernameChanged;
+            _userName.OnChange -= OnUsernameChanged;
         }
     }
 }

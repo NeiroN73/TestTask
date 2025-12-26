@@ -1,7 +1,9 @@
 using FishNet.Object;
 using Game.Installers;
+using Game.LifetimeScopes;
 using TriInspector;
 using VContainer;
+using VContainer.Unity;
 
 namespace Game.Creatures
 {
@@ -18,12 +20,22 @@ namespace Game.Creatures
             Configure(_componentsContainer);
             InitializeComponents();
         }
-        
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+
+            _objectResolver = LifetimeScope.Find<GameplayLifetimeScope>().Container;
+            _componentsContainer = new(gameObject);
+            Configure(_componentsContainer);
+            InitializeComponents();
+        }
+
         protected virtual void Configure(ComponentsContainer componentsContainer)
         {
         }
         
-        protected void InitializeComponents()
+        private void InitializeComponents()
         {
             var components = _componentsContainer.Components;
             foreach (var component in components)

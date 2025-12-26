@@ -13,28 +13,15 @@ MonoBehaviour:
   m_Name: Default Local Group
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
-  m_Data:
-    m_SerializedData: []
   m_GUID: db464eb0a5c119741a60bc81f257ea5b
   m_SerializeEntries:
-  - m_GUID: e659896cb9920a64493136eecff37144
-    m_Address: Assets/Submodules/GameCore/Prefabs/Screens
+  - m_GUID: 163641030eebf6145a3a38efeb61232b
+    m_Address: Assets/Content/Prefabs/Handlers
     m_ReadOnly: 0
     m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 76639344a236eb9428de0a6e5f7c6947
-    m_Address: Assets/Submodules/GameCore/Configs
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - coreConfigs
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a57a7343f15dda84d8ad6978748d2681
     m_Address: Assets/Content/Prefabs/Screens
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 163641030eebf6145a3a38efeb61232b
-    m_Address: Assets/Content/Prefabs/Handlers
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -48,5 +35,5 @@ MonoBehaviour:
   m_Settings: {fileID: 11400000, guid: 93816c0fad586254b878a71126dd00b7, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 18da1c42572936d4d99ce946cace66e4, type: 2}
     - {fileID: 11400000, guid: 2aca2d32791fc7e438234729123d1db4, type: 2}
+    - {fileID: 11400000, guid: 18da1c42572936d4d99ce946cace66e4, type: 2}

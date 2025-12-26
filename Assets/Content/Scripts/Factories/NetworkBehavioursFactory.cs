@@ -34,10 +34,12 @@ namespace Content.Scripts.Factories
             }
         }
         
-        [ServerRpc(RequireOwnership = false)]
-        public void Create(string id, NetworkConnection networkConnection, Vector3 position = default,
-            Quaternion rotation = default, Transform parent = null)
+        public void Create(string id, Vector3 position = default, Quaternion rotation = default,
+            Transform parent = null, NetworkConnection networkConnection = null)
         {
+            if(rotation == default)
+                rotation = Quaternion.identity;
+            
             var prefab = GetCreatureById(id);
             if (prefab == null)
                 throw new InvalidOperationException($"Creature with ID '{id}' not found in config");
@@ -59,15 +61,6 @@ namespace Content.Scripts.Factories
         }
         
         public void InitializeBehaviour(BaseNetworkBehaviour behaviour)
-        {
-            _objectResolver.Inject(behaviour);
-            behaviour.Initialize(_objectResolver);
-
-            ClientsInitializeBehaviourRpc(behaviour);
-        }
-
-        [ObserversRpc]
-        private void ClientsInitializeBehaviourRpc(BaseNetworkBehaviour behaviour)
         {
             _objectResolver.Inject(behaviour);
             behaviour.Initialize(_objectResolver);

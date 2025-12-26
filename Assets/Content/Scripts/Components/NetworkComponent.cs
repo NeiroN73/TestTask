@@ -15,18 +15,16 @@ namespace Game.Components
         {
             ComponentsContainer = componentsContainer;
         }
+
+        public override void OnStartClient() => SubscribeSyncVars();
+        public override void OnStopClient() => UnsubscribeSyncVars();
+
+        public virtual void SubscribeSyncVars() {}
+        public virtual void UnsubscribeSyncVars() {}
         
         public void Dispose()
         {
             Disposable.Dispose();
         }
-    }
-
-    public abstract class ServerNetworkComponent : NetworkComponent
-    {
-    }
-
-    public abstract class ClientNetworkComponent : NetworkComponent
-    {
     }
 }

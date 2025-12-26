@@ -8,14 +8,16 @@ namespace Game.Creatures
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private CharacterController _characterController;
-
-        [SerializeField] private TMP_Text _userNameText; //temp test
+        [SerializeField] private TMP_Text _userNameText;
+        [SerializeField] private string _cubeId;
 
         protected override void Configure(ComponentsContainer componentsContainer)
         {
             componentsContainer.TryAddNetworkComponent<MoveComponent>().Configure(_characterController, _animator);
             componentsContainer.TryAddNetworkComponent<InputLocalClientComponent, ControllerComponent>();
             componentsContainer.TryAddNetworkComponent<ChangeNameComponent>().Configure(_userNameText);
+            componentsContainer.TryAddNetworkComponent<SendDebugComponent>();
+            componentsContainer.TryAddNetworkComponent<SpawnCubeComponent>().Configure(_cubeId);
         }
     }
 }

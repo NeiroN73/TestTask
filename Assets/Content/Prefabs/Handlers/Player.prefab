@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 10451784500482987}
   - component: {fileID: 8845177598819192849}
   - component: {fileID: 7546340328324943746}
+  - component: {fileID: 7107625066966630927}
+  - component: {fileID: 1071347126129944193}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -213,6 +215,7 @@ MonoBehaviour:
   _animator: {fileID: 5202413193679753000}
   _characterController: {fileID: 8948568845466506890}
   _userNameText: {fileID: 7131392454668018468}
+  _cubeId: cube
 --- !u!114 &10451784500482987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,6 +261,36 @@ MonoBehaviour:
   _componentIndexCache: 5
   _addedNetworkObject: {fileID: 4006887360925407049}
   _networkObjectCache: {fileID: 4006887360925407049}
+--- !u!114 &7107625066966630927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b96c6148e58e44848e760cc0263e6a74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.SendDebugComponent
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 0}
+--- !u!114 &1071347126129944193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952076547882031899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecbd40f25724455e974f9a75c34c1da6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Components.SpawnCubeComponent
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 4006887360925407049}
+  _networkObjectCache: {fileID: 0}
 --- !u!1 &1233020742779370945
 GameObject:
   m_ObjectHideFlags: 0

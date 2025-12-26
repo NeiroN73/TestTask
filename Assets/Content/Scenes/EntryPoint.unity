@@ -574,7 +574,6 @@ MonoBehaviour:
   autoRun: 0
   autoInjectGameObjects:
   - {fileID: 572965947}
-  _configs: []
 --- !u!1 &1166938099
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,9 +624,6 @@ MonoBehaviour:
   autoInjectGameObjects:
   - {fileID: 308545287}
   - {fileID: 1217102844}
-  _configs: []
-  _coreConfigsAssetLabel:
-    m_LabelString: coreConfigs
   _gameConfigsAssetLabel:
     m_LabelString: gameConfigs
 --- !u!1 &1217102844
@@ -640,6 +636,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1217102845}
   - component: {fileID: 1217102846}
+  - component: {fileID: 1217102847}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -681,6 +678,25 @@ MonoBehaviour:
   _persistence: 0
   _logging: {fileID: 0}
   _spawnablePrefabs: {fileID: 11400000, guid: 921b31a94d55a0144b72d133f283f69f, type: 2}
+--- !u!114 &1217102847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1217102844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fdaae44044276a49a52229c1597e33b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Managing.Timing.TimeManager
+  _updateOrder: 0
+  _timingType: 0
+  _allowTickDropping: 1
+  _maximumFrameTicks: 3
+  _tickRate: 30
+  _pingInterval: 1
+  _physicsMode: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

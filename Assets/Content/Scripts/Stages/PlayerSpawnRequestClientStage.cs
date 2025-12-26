@@ -1,8 +1,8 @@
 using Content.Scripts.Factories;
 using Cysharp.Threading.Tasks;
 using FishNet.Connection;
+using FishNet.Object;
 using Game.Creatures;
-using UnityEngine;
 using VContainer;
 
 namespace Game.Stages
@@ -25,9 +25,10 @@ namespace Game.Stages
             await UniTask.CompletedTask;
         }
         
+        [ServerRpc(RequireOwnership = false)]
         private void CreateServerRpc()
         {
-            networkBehavioursFactory.Create("bob", _networkConnection, rotation: Quaternion.identity);
+            networkBehavioursFactory.Create("bob", networkConnection: _networkConnection);
         }
     }
 }

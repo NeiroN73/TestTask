@@ -33,15 +33,6 @@ namespace Game.Installers
             return null;
         }
 
-        [Button]
-        private void GatherNetworkSystems()
-        {
-            _gameplayLifetimeScope = FindAnyObjectByType<GameplayLifetimeScope>(FindObjectsInactive.Include);
-            _stages = FindObjectsByType<NetworkInstallerStage>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-            _services = FindObjectsByType<NetworkService>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-            _behaviours = FindObjectsByType<BaseNetworkBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-        }
-
         public override void OnStartNetwork()
         {
             base.OnStartNetwork();
@@ -52,27 +43,22 @@ namespace Game.Installers
         public override void OnSpawnServer(NetworkConnection connection)
         {
             base.OnSpawnServer(connection);
-
-            _gameplayLifetimeScope = FindAnyObjectByType<GameplayLifetimeScope>(FindObjectsInactive.Include);
-            _stages = FindObjectsByType<NetworkInstallerStage>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-            _services = FindObjectsByType<NetworkService>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-            _behaviours = FindObjectsByType<BaseNetworkBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
-            
-            _gameplayLifetimeScope.AddServices(_services);
-            _gameplayLifetimeScope.Build();
-            
-            _stages.ForEach(s => _gameplayLifetimeScope.Container.Inject(s));
-            _services.ForEach(s => _gameplayLifetimeScope.Container.Inject(s));
-            _behaviours.ForEach(s => _gameplayLifetimeScope.Container.Inject(s));
-            
-            _networkTickService = _gameplayLifetimeScope.Container.Resolve<NetworkTickService>();
             
             InitializeClientTarget(connection);
         }
-
+        
         [TargetRpc]
         private void InitializeClientTarget(NetworkConnection conn)
         {
+            var playerSpawnStage = TryGetStage<PlayerSpawnRequestClientStage>();
+            playerSpawnStage.Configure(conn);
+            RunStages();
+        }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            
             _gameplayLifetimeScope = FindAnyObjectByType<GameplayLifetimeScope>(FindObjectsInactive.Include);
             _stages = FindObjectsByType<NetworkInstallerStage>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
             _services = FindObjectsByType<NetworkService>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
@@ -86,10 +72,6 @@ namespace Game.Installers
             NetworkObjectInitializeUtils.InitializeNetworkObjects(_behaviours, _gameplayLifetimeScope.Container);
             
             _networkTickService = _gameplayLifetimeScope.Container.Resolve<NetworkTickService>();
-            
-            var playerSpawnStage = TryGetStage<PlayerSpawnRequestClientStage>();
-            playerSpawnStage.Configure(conn);
-            RunStages();
         }
 
         private void RunStages()
@@ -114,7 +96,7 @@ namespace Game.Installers
 
         private void ServerTick()
         {
-            _networkTickService?.ServerTick(Time.deltaTime); //todo: сделать через prediction
+            _networkTickService?.ServerTick(Time.deltaTime);
         }
 
         private void ClientTick()
@@ -127,6 +109,10 @@ namespace Game.Installers
         public override void OnStopNetwork()
         {
             base.OnStopNetwork();
+            
+            NetworkObjectInitializeUtils.DisposeNetworkObjects(_services, _gameplayLifetimeScope.Container);
+            NetworkObjectInitializeUtils.DisposeNetworkObjects(_stages, _gameplayLifetimeScope.Container);
+            NetworkObjectInitializeUtils.DisposeNetworkObjects(_behaviours, _gameplayLifetimeScope.Container);
             
             _networkTickService = null;
             _stagesByType.Clear();

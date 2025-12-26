@@ -11,8 +11,6 @@ namespace Game.LifetimeScopes
         
         protected override void RegisterConfigs()
         {
-            base.RegisterConfigs();
-            
             RegisterConfigs(_gameConfigsAssetLabel);
         }
         

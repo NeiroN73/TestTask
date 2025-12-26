@@ -8,11 +8,12 @@ namespace Game.Installers
 {
     public static class NetworkObjectInitializeUtils
     {
-        public static void InitializeNetworkObjects<TObject>(IEnumerable<TObject> objects, IObjectResolver objectResolver)
+        public static void InitializeNetworkObjects<TObject>(IEnumerable<TObject> objects, 
+            IObjectResolver objectResolver)
             where TObject : NetworkBehaviour
         {
             var tickService = objectResolver.Resolve<NetworkTickService>();
-
+            
             foreach (var obj in objects)
             {
                 var networkObject = obj.GetComponent<NetworkObject>();
@@ -38,25 +39,10 @@ namespace Game.Installers
                     {
                         serverPostInitialize.ServerPostInitialize();
                     }
-
-                    if (obj is IServerPreTickable serverPreTickable)
-                    {
-                        tickService.RegisterServerPreTick(serverPreTickable);
-                    }
-
+                    
                     if (obj is IServerTickable serverTickable)
                     {
                         tickService.RegisterServerTick(serverTickable);
-                    }
-
-                    if (obj is IServerPostTickable serverPostTickable)
-                    {
-                        tickService.RegisterServerPostTick(serverPostTickable);
-                    }
-
-                    if (obj is IServerDisposable serverDisposable)
-                    {
-                        serverDisposable.ServerDispose();
                     }
                 }
 
@@ -76,25 +62,10 @@ namespace Game.Installers
                     {
                         clientPostInitialize.ClientPostInitialize();
                     }
-
-                    if (obj is IClientPreTickable clientPreTickable)
-                    {
-                        tickService.RegisterClientPreTick(clientPreTickable);
-                    }
-
+                    
                     if (obj is IClientTickable clientTickable)
                     {
                         tickService.RegisterClientTick(clientTickable);
-                    }
-
-                    if (obj is IClientPostTickable clientPostTickable)
-                    {
-                        tickService.RegisterClientPostTick(clientPostTickable);
-                    }
-
-                    if (obj is IClientDisposable clientDisposable)
-                    {
-                        clientDisposable.ClientDispose();
                     }
 
                     if (networkObject.IsOwner)
@@ -114,24 +85,9 @@ namespace Game.Installers
                             localClientPostInitialize.LocalClientPostInitialize();
                         }
 
-                        if (obj is ILocalClientPreTickable localClientPreTickable)
-                        {
-                            tickService.RegisterLocalClientPreTick(localClientPreTickable);
-                        }
-
                         if (obj is ILocalClientTickable localClientTickable)
                         {
                             tickService.RegisterLocalClientTick(localClientTickable);
-                        }
-
-                        if (obj is ILocalClientPostTickable localClientPostTickable)
-                        {
-                            tickService.RegisterLocalClientPostTick(localClientPostTickable);
-                        }
-
-                        if (obj is ILocalClientDisposable localClientDisposable)
-                        {
-                            localClientDisposable.LocalClientDispose();
                         }
                     }
                     else
@@ -151,19 +107,67 @@ namespace Game.Installers
                             otherClientsPostInitialize.OtherClientsPostInitialize();
                         }
 
-                        if (obj is IOtherClientsPreTickable otherClientsPreTickable)
-                        {
-                            tickService.RegisterOtherClientsPreTick(otherClientsPreTickable);
-                        }
-
                         if (obj is IOtherClientsTickable otherClientsTickable)
                         {
                             tickService.RegisterOtherClientsTick(otherClientsTickable);
                         }
+                    }
+                }
+            }
+        }
 
-                        if (obj is IOtherClientsPostTickable otherClientsPostTickable)
+        public static void DisposeNetworkObjects<TObject>(IEnumerable<TObject> objects, 
+            IObjectResolver objectResolver)
+            where TObject : NetworkBehaviour
+        {
+            var tickService = objectResolver.Resolve<NetworkTickService>();
+
+            foreach (var obj in objects)
+            {
+                var networkObject = obj.GetComponent<NetworkObject>();
+                
+                if (networkObject.IsServerInitialized)
+                {
+                    if (obj is IServerTickable serverTickable)
+                    {
+                        tickService.UnregisterServerTick(serverTickable);
+                    }
+
+                    if (obj is IServerDisposable serverDisposable)
+                    {
+                        serverDisposable.ServerDispose();
+                    }
+                }
+
+                if (networkObject.IsClientInitialized)
+                {
+                    if (obj is IClientTickable clientTickable)
+                    {
+                        tickService.UnregisterClientTick(clientTickable);
+                    }
+
+                    if (obj is IClientDisposable clientDisposable)
+                    {
+                        clientDisposable.ClientDispose();
+                    }
+
+                    if (networkObject.IsOwner)
+                    {
+                        if (obj is ILocalClientTickable localClientTickable)
                         {
-                            tickService.RegisterOtherClientsPostTick(otherClientsPostTickable);
+                            tickService.UnregisterLocalClientTick(localClientTickable);
+                        }
+
+                        if (obj is ILocalClientDisposable localClientDisposable)
+                        {
+                            localClientDisposable.LocalClientDispose();
+                        }
+                    }
+                    else
+                    {
+                        if (obj is IOtherClientsTickable otherClientsTickable)
+                        {
+                            tickService.UnregisterOtherClientsTick(otherClientsTickable);
                         }
 
                         if (obj is IOtherClientsDisposable otherClientsDisposable)
