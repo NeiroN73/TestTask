@@ -4,7 +4,7 @@ using FishNet.Broadcast;
 using FishNet.Connection;
 using FishNet.Transporting;
 
-namespace Content.Scripts.EventBus
+namespace Game.NetworkEventBus
 {
     public sealed class ServerEventBus : NetworkEventBus
     {

@@ -1,6 +1,5 @@
-
 using FishNet.Object;
-using Game.Creatures;
+using Game.NetworkInterfaces;
 using R3;
 using UnityEngine;
 
@@ -42,7 +41,7 @@ namespace Game.Components
 
         private void DebugPerform(string username)
         {
-            Debug.Log("Привет от" + username);
+            Debug.Log("Привет от " + username);
         }
     }
 }

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using FishNet.Broadcast;
 
-namespace Content.Scripts.EventBus
+namespace Game.NetworkEventBus
 {
+    //для избежания сетевых атрибутов, которые доступны только в NetworkBehaviour
     public abstract class NetworkEventBus
     {
         protected readonly Dictionary<Type, List<Delegate>> SubscriptionsByType = new();

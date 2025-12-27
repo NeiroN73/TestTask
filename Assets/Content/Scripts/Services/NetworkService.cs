@@ -1,6 +1,6 @@
 ﻿using FishNet.Object;
 
-namespace Content.Scripts.Factories
+namespace Game.Services
 {
     public class NetworkService : NetworkBehaviour
     {

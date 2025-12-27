@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FishNet.Object;
-using Game.Creatures;
+using Game.NetworkInterfaces;
 using Game.Services;
 using VContainer;
 

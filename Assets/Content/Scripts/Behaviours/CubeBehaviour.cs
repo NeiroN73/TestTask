@@ -1,4 +1,4 @@
-namespace Game.Creatures
+namespace Game.Behaviours
 {
     public class CubeBehaviour : BaseNetworkBehaviour
     {

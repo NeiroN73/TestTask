@@ -1,6 +1,7 @@
 ﻿using FishNet.Object;
 using FishNet.Object.Synchronizing;
-using Game.Creatures;
+using Game.NetworkInterfaces;
+using Game.Observers;
 using Game.Services;
 using TMPro;
 using VContainer;
@@ -10,7 +11,7 @@ namespace Game.Components
     public class ChangeNameComponent : NetworkComponent, IInjectable, IClientPreInitializable,
         ILocalClientInitializable, IClientDisposable
     {
-        private readonly SyncVar<string> _userName = new(new SyncTypeSettings(ReadPermission.OwnerOnly));
+        private readonly SyncVar<string> _userName = new();
         
         private TMP_Text _userNameText;
         
@@ -43,7 +44,10 @@ namespace Game.Components
             if (_userNameText)
             {
                 _userNameText.text = name;
-                UsernameChanged.Publish(name);
+                if (IsOwner)
+                {
+                    UsernameChanged.Publish(name);
+                }
             }
         }
 

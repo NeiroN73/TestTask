@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using FishNet;
 using FishNet.Connection;
-using FishNet.Object;
-using Game.Creatures;
+using Game.Behaviours;
+using Game.NetworkInterfaces;
 using GameCore.Configs;
 using GameCore.Services;
 using UnityEngine;
 using VContainer;
 
-namespace Content.Scripts.Factories
+namespace Game.Services
 {
     public class NetworkBehavioursFactory : NetworkService, IServerInitializable, IInjectable
     {
@@ -40,22 +40,22 @@ namespace Content.Scripts.Factories
             if(rotation == default)
                 rotation = Quaternion.identity;
             
-            var prefab = GetCreatureById(id);
+            var prefab = GetBehaviourById(id);
             if (prefab == null)
-                throw new InvalidOperationException($"Creature with ID '{id}' not found in config");
+                throw new InvalidOperationException($"Behaviour with ID '{id}' not found in config");
 
             var behaviour = Instantiate(prefab, position, rotation, parent);
             InstanceFinder.ServerManager.Spawn(behaviour.gameObject, networkConnection);
             InitializeBehaviour(behaviour);
         }
         
-        private BaseNetworkBehaviour GetCreatureById(string id)
+        private BaseNetworkBehaviour GetBehaviourById(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
         
-            if (_behavioursById.TryGetValue(id, out var creature))
+            if (_behavioursById.TryGetValue(id, out var behaviour))
             {
-                return creature;
+                return behaviour;
             }
             return null;
         }

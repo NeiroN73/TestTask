@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Game.UI.MainMenu
 {
+    //todo: переработка mvvm
     public class MainMenuScreen : Screen<MainMenuViewModel>
     {
         [SerializeField] private InputFieldTextChangedViewBinder _playerName = new("playerName");

@@ -1,8 +1,8 @@
-﻿namespace Game.Components
-{ 
-    using R3;
-    using System;
+﻿using R3;
+using System;
 
+namespace Game.Observers
+{ 
     public abstract class ObserverBase : IDisposable
     {
         protected readonly CompositeDisposable _compositeDisposable = new();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Content.Scripts.EventBus
+namespace Game.NetworkEventBus
 {
     public class NetworkEventHandler
     {
@@ -13,6 +13,11 @@ namespace Content.Scripts.EventBus
             Type = type;
             Action = action;
             NetworkEventBus = networkEventBus;
+        }
+        
+        public void AddDisposable(NetworkEventDisposable disposable)
+        {
+            disposable.Add(this);
         }
     }
 }

@@ -1,8 +1,8 @@
-using Content.Scripts.Factories;
 using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using FishNet.Object;
-using Game.Creatures;
+using Game.NetworkInterfaces;
+using Game.Services;
 using VContainer;
 
 namespace Game.Stages
@@ -20,15 +20,16 @@ namespace Game.Stages
         
         public override async UniTask Run()
         {
-            CreateServerRpc();
+            CreateServerRpc(_networkConnection);
             
             await UniTask.CompletedTask;
         }
         
         [ServerRpc(RequireOwnership = false)]
-        private void CreateServerRpc()
+        private void CreateServerRpc(NetworkConnection conn)
         {
-            networkBehavioursFactory.Create("bob", networkConnection: _networkConnection);
+            //todo: сделать систему айдишников
+            networkBehavioursFactory.Create("bob", networkConnection: conn);
         }
     }
 }

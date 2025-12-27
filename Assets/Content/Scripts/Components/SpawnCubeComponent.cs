@@ -1,6 +1,6 @@
-using Content.Scripts.Factories;
 using FishNet.Object;
-using Game.Creatures;
+using Game.NetworkInterfaces;
+using Game.Services;
 using R3;
 using VContainer;
 

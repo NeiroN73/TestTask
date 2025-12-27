@@ -6,6 +6,5 @@ namespace Game.Stages
     public abstract class InstallerStage : MonoBehaviour
     {
         public abstract UniTask Run();
-        public virtual void Dispose() {}
     }
 }

@@ -1,13 +1,15 @@
 using FishNet.Connection;
-using FishNet.Object;
-using Game.LifetimeScopes;
 using Game.Stages;
-using UnityEngine;
 
 namespace Game.Installers
 {
     public class GameplayInstaller : BaseNetworkInstaller
     {
-        
+        protected override void ConfigureStages(NetworkConnection conn)
+        {
+            base.ConfigureStages(conn);
+            
+            TryGetStage<PlayerSpawnRequestClientStage>().Configure(conn);
+        }
     }
 }

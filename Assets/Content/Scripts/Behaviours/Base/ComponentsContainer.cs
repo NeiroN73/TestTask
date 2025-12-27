@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Game.Components;
 using UnityEngine;
 
-namespace Game.Creatures
+namespace Game.Behaviours
 {
     public class ComponentsContainer
     {
@@ -39,15 +39,16 @@ namespace Game.Creatures
                 {
                     return outComponent;
                 }
+                return null;
             }
 #if UNITY_EDITOR
             else
             {
                 return _gameObject.AddComponent<T>();
             }
-#endif
-            
+#else
             return null;
+#endif
         }
         
         public TComponent TryAddNetworkComponent<TComponent, TBaseComponent>()

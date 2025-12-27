@@ -3,7 +3,7 @@ using FishNet;
 using FishNet.Broadcast;
 using FishNet.Transporting;
 
-namespace Content.Scripts.EventBus
+namespace Game.NetworkEventBus
 {
     public sealed class ClientEventBus : NetworkEventBus
     {

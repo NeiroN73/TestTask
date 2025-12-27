@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Content.Scripts.EventBus
+namespace Game.NetworkEventBus
 {
     public class NetworkEventDisposable
     {

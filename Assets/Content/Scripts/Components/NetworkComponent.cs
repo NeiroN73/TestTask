@@ -1,6 +1,6 @@
 ﻿using System;
 using FishNet.Object;
-using Game.Creatures;
+using Game.Behaviours;
 using R3;
 
 namespace Game.Components
@@ -15,12 +15,6 @@ namespace Game.Components
         {
             ComponentsContainer = componentsContainer;
         }
-
-        public override void OnStartClient() => SubscribeSyncVars();
-        public override void OnStopClient() => UnsubscribeSyncVars();
-
-        public virtual void SubscribeSyncVars() {}
-        public virtual void UnsubscribeSyncVars() {}
         
         public void Dispose()
         {

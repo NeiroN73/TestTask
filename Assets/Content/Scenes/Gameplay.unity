@@ -537,7 +537,7 @@ GameObject:
   - component: {fileID: 1327898213}
   - component: {fileID: 1327898214}
   m_Layer: 0
-  m_Name: LifetimeScopes
+  m_Name: GameplayLifetimeScope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -577,8 +577,6 @@ MonoBehaviour:
   - {fileID: 2009856746}
   - {fileID: 585845997}
   - {fileID: 380858870}
-  _configs:
-  - {fileID: 11400000, guid: 9e90280cb197a0d48bc0c318b041b523, type: 2}
 --- !u!1 &1532566326
 GameObject:
   m_ObjectHideFlags: 0
@@ -819,19 +817,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2009856746}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f30be78c28ee460abd27680981723a9a, type: 3}
+  m_Script: {fileID: 11500000, guid: a174938718f04904ae0780f440ecb1d7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Installers.BaseNetworkInstaller
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Installers.GameplayInstaller
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 2009856750}
   _networkObjectCache: {fileID: 0}
-  _gameplayLifetimeScope: {fileID: 1327898214}
-  _stages:
-  - {fileID: 380858871}
-  _services:
-  - {fileID: 585845998}
-  - {fileID: 585846002}
-  _behaviours: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -121,46 +121,5 @@ namespace Game.Services
                 throw new TimeoutException($"{operationName} timeout after {timeout.TotalSeconds} seconds");
             }
         }
-
-        public async UniTask StartServerAsync(Action onSuccess)
-        {
-            try
-            {
-                _screensService.OpenLoading<LoadingScreen>();
-
-                await StopActiveNetworkConnection();
-                await _scenesService.LoadSceneAsync(SceneConsts.Gameplay);
-
-                NetworkManager.ServerManager.StartConnection();
-
-                await WaitForNetworkCondition(() => NetworkManager.ServerManager.Started, TimeSpan.FromSeconds(20),
-                    "Server activation");
-
-                onSuccess?.Invoke();
-            }
-            catch (Exception ex)
-            {
-                HandleNetworkError(() => NetworkManager.ServerManager.StopConnection(true), ex);
-                throw;
-            }
-            finally
-            {
-                _screensService.CloseLoading();
-            }
-        }
-
-        public void Disconnect()
-        {
-            if (NetworkManager.ServerManager.Started)
-                NetworkManager.ServerManager.StopConnection(true);
-
-            if (NetworkManager.ClientManager.Started)
-                NetworkManager.ClientManager.StopConnection();
-        }
-
-        public bool IsHosting => NetworkManager.ServerManager.Started && NetworkManager.ClientManager.Started;
-        public bool IsServerOnly => NetworkManager.ServerManager.Started && !NetworkManager.ClientManager.Started;
-        public bool IsClientOnly => !NetworkManager.ServerManager.Started && NetworkManager.ClientManager.Started;
-        public bool IsConnected => NetworkManager.ClientManager.Started;
     }
 }

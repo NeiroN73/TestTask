@@ -2,13 +2,14 @@
 using TMPro;
 using UnityEngine;
 
-namespace Game.Creatures
+namespace Game.Behaviours
 {
     public class PlayerBehaviour : BaseNetworkBehaviour
     {
         [SerializeField] private Animator _animator;
         [SerializeField] private CharacterController _characterController;
         [SerializeField] private TMP_Text _userNameText;
+        //todo: сделать систему айдишников
         [SerializeField] private string _cubeId;
 
         protected override void Configure(ComponentsContainer componentsContainer)

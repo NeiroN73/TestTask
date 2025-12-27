@@ -1,6 +1,6 @@
 using FishNet.Object;
 using Game.Configs;
-using Game.Creatures;
+using Game.NetworkInterfaces;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -10,8 +10,8 @@ namespace Game.Components
     public class MoveComponent : NetworkComponent, IInjectable, IClientPreInitializable, IServerTickable,
         IClientTickable
     {
+        private const float _lerpValue = 0.1f;
         private readonly int _isRunning = Animator.StringToHash("isRunning");
-        private const float LerpValue = 0.1f;
         
         private CharacterController _characterController;
         private Animator _animator;
@@ -35,7 +35,7 @@ namespace Game.Components
         {
             if (ComponentsContainer.TryGetNetworkComponent<ControllerComponent>(out var component))
             {
-                component.MoveInputed.Subscribe(OnMovedDirectionServerRpc).AddTo(Disposable);
+                component.MovePerformed.Subscribe(OnMovedDirectionServerRpc).AddTo(Disposable);
             }
         }
 
@@ -59,10 +59,11 @@ namespace Game.Components
             UpdateMovementObserversRpc(transform.position, transform.rotation, isMoving);
         }
         
+        //todo: сделать через prediction
         public void ClientTick(float deltaTime)
         {
-            transform.position = Vector3.LerpUnclamped(transform.position, _movePosition, LerpValue);
-            transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, _moveRotation, LerpValue);
+            transform.position = Vector3.LerpUnclamped(transform.position, _movePosition, _lerpValue);
+            transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, _moveRotation, _lerpValue);
             _animator.SetBool(_isRunning, _isMoving);
         }
 

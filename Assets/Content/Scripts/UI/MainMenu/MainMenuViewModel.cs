@@ -1,4 +1,3 @@
-using Game.NetworkManagers;
 using Game.Services;
 using GameCore.Factories;
 using GameCore.Services;
@@ -9,6 +8,7 @@ using VContainer;
 
 namespace Game.UI.MainMenu
 {
+    //todo: переработка mvvm
     public class MainMenuViewModel : ViewModel
     {
         [Inject] private ScreensService _screensService;
@@ -20,8 +20,6 @@ namespace Game.UI.MainMenu
         private readonly RefTypeViewModelBinder<ReactiveCommand<string>> _playerNameInputField = new("playerName");
         private readonly RefTypeViewModelBinder<ReactiveCommand> _hostButton = new("hostButton");
         private readonly RefTypeViewModelBinder<ReactiveCommand> _joinButton = new("joinButton");
-
-        private string _playerName;
         
         public override void Initialize()
         {
@@ -34,7 +32,6 @@ namespace Game.UI.MainMenu
 
         private void OnPlayerNameChanged(string playerName)
         {
-            _playerName = playerName;
             _playerState.Username = playerName;
         }
          
@@ -50,7 +47,6 @@ namespace Game.UI.MainMenu
 
         private void OnSuccess()
         {
-            //_screensService.Close();
         }
     }
 }

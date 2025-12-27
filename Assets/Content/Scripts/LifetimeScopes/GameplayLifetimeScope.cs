@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Content.Scripts.Factories;
+using Game.Services;
 using GameCore.LifetimeScopes;
 
 namespace Game.LifetimeScopes

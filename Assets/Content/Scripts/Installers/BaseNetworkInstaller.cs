@@ -1,68 +1,47 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Content.Scripts.Factories;
 using FishNet.Connection;
 using FishNet.Object;
-using Game.Creatures;
+using Game.Behaviours;
 using Game.LifetimeScopes;
 using Game.Services;
 using Game.Stages;
-using TriInspector;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
 namespace Game.Installers
 {
     public class BaseNetworkInstaller : NetworkBehaviour
     {
-        [SerializeField] private GameplayLifetimeScope _gameplayLifetimeScope;
-        [SerializeField] private List<NetworkInstallerStage> _stages = new();
-        [SerializeField] private List<NetworkService> _services = new();
-        [SerializeField] private List<BaseNetworkBehaviour> _behaviours = new();
+        private GameplayLifetimeScope _gameplayLifetimeScope;
+        private List<NetworkInstallerStage> _stages = new();
+        private List<NetworkService> _services = new();
+        private List<BaseNetworkBehaviour> _behaviours = new();
         
         private Dictionary<Type, NetworkInstallerStage> _stagesByType = new();
         private NetworkTickService _networkTickService;
-
-        private T TryGetStage<T>() where T : NetworkInstallerStage
-        {
-            if (_stagesByType.TryGetValue(typeof(T), out var stage))
-            {
-                return (T)stage;
-            }
-            return null;
-        }
-
-        public override void OnStartNetwork()
-        {
-            base.OnStartNetwork();
-            
-            _stagesByType = _stages.ToDictionary(s => s.GetType());
-        }
-
+        
+        private bool _isInitialized;
+        
         public override void OnSpawnServer(NetworkConnection connection)
         {
             base.OnSpawnServer(connection);
             
             InitializeClientTarget(connection);
         }
-        
-        [TargetRpc]
-        private void InitializeClientTarget(NetworkConnection conn)
-        {
-            var playerSpawnStage = TryGetStage<PlayerSpawnRequestClientStage>();
-            playerSpawnStage.Configure(conn);
-            RunStages();
-        }
 
         public override void OnStartClient()
         {
             base.OnStartClient();
             
-            _gameplayLifetimeScope = FindAnyObjectByType<GameplayLifetimeScope>(FindObjectsInactive.Include);
+            _gameplayLifetimeScope = LifetimeScope.Find<GameplayLifetimeScope>() as GameplayLifetimeScope;
             _stages = FindObjectsByType<NetworkInstallerStage>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
             _services = FindObjectsByType<NetworkService>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
             _behaviours = FindObjectsByType<BaseNetworkBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+            
+            _stagesByType = _stages.ToDictionary(s => s.GetType());
             
             _gameplayLifetimeScope.AddServices(_services);
             _gameplayLifetimeScope.Build();
@@ -74,16 +53,39 @@ namespace Game.Installers
             _networkTickService = _gameplayLifetimeScope.Container.Resolve<NetworkTickService>();
         }
 
-        private void RunStages()
+        protected T TryGetStage<T>() where T : NetworkInstallerStage
+        {
+            if (_stagesByType.TryGetValue(typeof(T), out var stage))
+            {
+                return (T)stage;
+            }
+            return null;
+        }
+        
+        protected virtual void ConfigureStages(NetworkConnection conn) {}
+        
+        [TargetRpc]
+        private void InitializeClientTarget(NetworkConnection conn)
+        {
+            ConfigureStages(conn);
+            RunStages();
+        }
+        
+        private async void RunStages()
         {
             foreach (var stage in _stages)
             {
-                stage.Run();
+                await stage.Run();
             }
+
+            _isInitialized = true;
         }
 
         private void Update()
         {
+            if (!_isInitialized)
+                return;
+            
             if (IsServerInitialized)
             {
                 ServerTick();
@@ -96,14 +98,14 @@ namespace Game.Installers
 
         private void ServerTick()
         {
-            _networkTickService?.ServerTick(Time.deltaTime);
+            _networkTickService.ServerTick(Time.deltaTime);
         }
 
         private void ClientTick()
         {
-            _networkTickService?.ClientTick(Time.deltaTime);
-            _networkTickService?.LocalClientTick(Time.deltaTime);
-            _networkTickService?.OtherClientsTick(Time.deltaTime);
+            _networkTickService.ClientTick(Time.deltaTime);
+            _networkTickService.LocalClientTick(Time.deltaTime);
+            _networkTickService.OtherClientsTick(Time.deltaTime);
         }
 
         public override void OnStopNetwork()

@@ -5,7 +5,7 @@ using TriInspector;
 using VContainer;
 using VContainer.Unity;
 
-namespace Game.Creatures
+namespace Game.Behaviours
 {
     public abstract class BaseNetworkBehaviour : NetworkBehaviour
     {
@@ -21,6 +21,8 @@ namespace Game.Creatures
             InitializeComponents();
         }
 
+        //приходится отсюда инитить, потому что иначе SyncVar не сможет обновлять переменные игроков при подключении,
+        //todo: надо переделать, так как це костыль :(
         public override void OnStartClient()
         {
             base.OnStartClient();
@@ -46,6 +48,8 @@ namespace Game.Creatures
             NetworkObjectInitializeUtils.InitializeNetworkObjects(components, _objectResolver);
         }
 
+        //в fishnet нельзя добавлять компоненты в рантайме, во прикол
+        //todo: автоматизировать, чтобы объекты сами обновлялись
 #if UNITY_EDITOR
         [Button]
         private void UpdateNetworkComponents()
