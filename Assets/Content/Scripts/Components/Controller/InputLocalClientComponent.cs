@@ -23,17 +23,17 @@ namespace Game.Components
         {
             var value = obj.ReadValue<Vector2>();
             var moveDirection = new Vector3(value.x, 0, value.y);
-            MovePerformed.Publish(moveDirection);
+            MovePerformed.Execute(moveDirection);
         }
         
         private void SpawnOnPerformed(InputAction.CallbackContext obj)
         {
-            SpawnPerformed.Publish();
+            SpawnPerformed.Execute();
         }
 
         private void DebugOnPerformed(InputAction.CallbackContext obj)
         {
-            DebugPerformed.Publish();
+            DebugPerformed.Execute();
         }
 
         public void LocalClientDispose()

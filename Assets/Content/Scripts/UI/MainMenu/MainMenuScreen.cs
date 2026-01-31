@@ -3,16 +3,22 @@ using UnityEngine;
 
 namespace Game.UI.MainMenu
 {
-    //todo: переработка mvvm
     public class MainMenuScreen : Screen<MainMenuViewModel>
     {
-        [SerializeField] private InputFieldTextChangedViewBinder _playerName = new("playerName");
-        [SerializeField] private ButtonViewBinder _hostButton = new("hostButton");
-        [SerializeField] private ButtonViewBinder _joinButton = new("joinButton");
+        [SerializeField] private InputFieldBinder _playerName;
+        [SerializeField] private ButtonBinder _hostButton;
+        [SerializeField] private ButtonBinder _joinButton;
+        [SerializeField] private TextBinder _hostText;
         
         public override void Initialize()
         {
-            Bind(_playerName, _hostButton, _joinButton);
+            ViewModel.HostButton = _hostButton.Clicked;
+            ViewModel.JoinButton = _joinButton.Clicked;
+            ViewModel.PlayerNameInputField = _playerName.TextChangeInputed;
+            ViewModel.PlayerNameInputFieldTextChanged = _playerName.TextChanged;
+            ViewModel.TestText = _hostText.TestTextChanged;
+            
+            Build(_playerName, _hostButton, _joinButton, _hostText);
         }
     }
 }

@@ -1,12 +1,12 @@
-using Game.Observers;
+using GameCore.ReactiveObservers;
 using UnityEngine;
 
 namespace Game.Components
 {
     public abstract class ControllerComponent : NetworkComponent
     {
-        public Observer<Vector3> MovePerformed = new();
-        public Observer DebugPerformed { get; } = new();
-        public Observer SpawnPerformed { get; } = new();
+        public ReactiveObserver<Vector3> MovePerformed = new();
+        public ReactiveObserver DebugPerformed { get; } = new();
+        public ReactiveObserver SpawnPerformed { get; } = new();
     }
 }

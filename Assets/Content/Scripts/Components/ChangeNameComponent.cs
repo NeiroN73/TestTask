@@ -1,8 +1,8 @@
 ﻿using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using Game.NetworkInterfaces;
-using Game.Observers;
 using Game.Services;
+using GameCore.ReactiveObservers;
 using TMPro;
 using VContainer;
 
@@ -17,7 +17,7 @@ namespace Game.Components
         
         [Inject] private PlayerState _playerState;
 
-        public Observer<string> UsernameChanged = new();
+        public ReactiveObserver<string> UsernameChanged = new();
 
         public void Configure(TMP_Text userNameText)
         {
@@ -46,7 +46,7 @@ namespace Game.Components
                 _userNameText.text = name;
                 if (IsOwner)
                 {
-                    UsernameChanged.Publish(name);
+                    UsernameChanged.Execute(name);
                 }
             }
         }
