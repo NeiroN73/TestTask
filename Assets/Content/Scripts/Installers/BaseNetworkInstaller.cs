@@ -36,6 +36,8 @@ namespace Game.Installers
         {
             base.OnStartClient();
             
+            Debug.Log("Client started");
+            
             _gameplayLifetimeScope = LifetimeScope.Find<GameplayLifetimeScope>() as GameplayLifetimeScope;
             _stages = FindObjectsByType<NetworkInstallerStage>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
             _services = FindObjectsByType<NetworkService>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
@@ -51,6 +53,13 @@ namespace Game.Installers
             NetworkObjectInitializeUtils.InitializeNetworkObjects(_behaviours, _gameplayLifetimeScope.Container);
             
             _networkTickService = _gameplayLifetimeScope.Container.Resolve<NetworkTickService>();
+        }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            
+            Debug.Log("Server started");
         }
 
         protected T TryGetStage<T>() where T : NetworkInstallerStage

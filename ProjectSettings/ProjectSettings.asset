@@ -143,7 +143,8 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 0.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: -944628639613478452, guid: c8bd05ea539237547a0e83f5d56b7364, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -871,6 +872,7 @@ PlayerSettings:
     PS4: DOTWEEN
     PS5: DOTWEEN
     QNX: DOTWEEN
+    Server: FISHNET;FISHNET_V4
     Stadia: DOTWEEN
     Standalone: EDGEGAP_PLUGIN_SERVERS;DOTWEEN;FISHNET;FISHNET_V4
     VisionOS: DOTWEEN

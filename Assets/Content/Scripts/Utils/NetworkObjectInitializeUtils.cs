@@ -124,6 +124,9 @@ namespace Game.Installers
 
             foreach (var obj in objects)
             {
+                if (obj == null)
+                    continue;
+                
                 var networkObject = obj.GetComponent<NetworkObject>();
                 
                 if (networkObject.IsServerInitialized)

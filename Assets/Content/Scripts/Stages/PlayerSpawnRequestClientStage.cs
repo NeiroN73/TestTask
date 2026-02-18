@@ -3,6 +3,7 @@ using FishNet.Connection;
 using FishNet.Object;
 using Game.NetworkInterfaces;
 using Game.Services;
+using UnityEngine;
 using VContainer;
 
 namespace Game.Stages

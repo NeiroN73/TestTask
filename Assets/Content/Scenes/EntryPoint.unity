@@ -165,7 +165,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LifetimeScope: {fileID: 1166938101}
-  _entryPointInstaller: {fileID: 572965949}
 --- !u!1 &572965947
 GameObject:
   m_ObjectHideFlags: 0

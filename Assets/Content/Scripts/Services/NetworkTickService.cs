@@ -46,7 +46,7 @@ namespace Game.Services
         public void OtherClientsTick(float deltaTime) => 
             TickCollection(_otherClientsTickables, t => t.OtherClientsTick(deltaTime));
 
-        private static void TickCollection<T>(List<T> tickables, System.Action<T> tickAction) where T : class
+        private void TickCollection<T>(List<T> tickables, System.Action<T> tickAction) where T : class
         {
             for (int i = 0; i < tickables.Count; i++)
             {
